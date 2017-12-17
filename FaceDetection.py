@@ -29,9 +29,9 @@ def removeDuplicates(detected):
 def getCascades():
 	cascadePaths = ['/usr/local/Cellar/opencv/3.3.0_3/share/OpenCV/haarcascades/haarcascade_frontalface_default.xml',
 					'/usr/local/Cellar/opencv/3.3.0_3/share/OpenCV/haarcascades/haarcascade_profileface.xml',
-					'/usr/local/Cellar/opencv/3.3.0_3/share/OpenCV/haarcascades/haarcascade_frontalface_alt_tree.xml',
-					'/usr/local/Cellar/opencv/3.3.0_3/share/OpenCV/haarcascades/haarcascade_frontalface_alt.xml',
-					'/usr/local/Cellar/opencv/3.3.0_3/share/OpenCV/haarcascades/haarcascade_frontalface_alt2.xml']
+					'/usr/local/Cellar/opencv/3.3.0_3/share/OpenCV/haarcascades/haarcascade_frontalface_alt_tree.xml']#,
+					#'/usr/local/Cellar/opencv/3.3.0_3/share/OpenCV/haarcascades/haarcascade_frontalface_alt.xml',
+					#'/usr/local/Cellar/opencv/3.3.0_3/share/OpenCV/haarcascades/haarcascade_frontalface_alt2.xml']
 	cascades = []
 	for cascadePath in cascadePaths:
 		cascades.append(cv2.CascadeClassifier(cascadePath))

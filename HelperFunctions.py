@@ -36,12 +36,12 @@ def bbOverLapRatio(bb1, bb2):
 	iou = intersection_area / float(bb1_area + bb2_area - intersection_area)
 	return iou
 
-CROP_EXTRA = 0
+CROP_EXTRA = 50
 
 def cropImage(img, person):
 	(x,y,w,h) = person.face
-	x = x-CROP_EXTRA
-	y = y-CROP_EXTRA
+	x = max(0, x-CROP_EXTRA)
+	y = max(0, y-CROP_EXTRA)
 	h = h+CROP_EXTRA*2
 	w = w+CROP_EXTRA*2
 	person.face = (x,y,w,h)

@@ -9,3 +9,5 @@ class Person:
 		self.cascadeIdentifier = cascadeIdentifier
 		self.image = HelperFunctions.cropImage(img, self)
 		self.landmarks = []
+		self.humanAttention = None
+		self.attention = None
