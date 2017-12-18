@@ -32,10 +32,9 @@ def showFaceImages(img, persons):
 def faceLandmarks(person, mark=False):
 	predictor = dlib.shape_predictor('shape_predictor_68_face_landmarks.dat')
 	
-	image = person.image
 	rect = HelperFunctions.dlibBBToRect(0,0,person.face[2],person.face[3])
 
-	gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+	gray = cv2.cvtColor(person.image, cv2.COLOR_BGR2GRAY)
 
 	# determine the facial landmarks for the face region, then
 	# convert the facial landmark (x, y)-coordinates to a NumPy
@@ -44,15 +43,7 @@ def faceLandmarks(person, mark=False):
 	landmarks = HelperFunctions.shape_to_np(landmarks)
 	person.landmarks = landmarks.tolist()
 	if mark:
-		# loop over the (x, y)-coordinates for the facial landmarks
-		# and draw them on the image
-		cv2.imshow('original',image)
+		# loop over the (x, y)-coordinates for the facial landmarks and draw them on the image
 		for (x, y) in landmarks:
-			print(x)
-			print(y)
-			cv2.circle(image, (x, y), 1, (0, 0, 255), -1)
-	
-	
-	#cv2.imshow('landmarks',image)
-	#keyPressed = cv2.waitKey()
-	return True #not keyPressed == 113
+			print(str(x) + ', ' + str(person.face[3]))
+			cv2.circle(person.image, (x, y), 1, (0, 0, 255), -1)

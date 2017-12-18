@@ -7,7 +7,7 @@ from Person import Person
 def convertToObjects(img, withoutDups):
 	persons = []
 	for faces in withoutDups:
-		persons.append(Person(img, faces[0][0],faces[0][1])) #could add a better way to choose the best face
+		persons.append(Person(img.img, faces[0][0],faces[0][1])) #could add a better way to choose the best face
 	return persons
 
 
@@ -39,18 +39,18 @@ def getCascades():
 
 
 def findFaces(img, mark=False):
+	print('Detecting faces...')
 	cascades = getCascades()
 	detectedAll = []
 	totalSize = 0 
 	for index, cascade in enumerate(cascades):
-		detected = cascade.detectMultiScale(img, 1.2, 1)
+		detected = cascade.detectMultiScale(img.img, 1.2, 1)
 		cascadeIdentifier = [0] * len(cascades)
 		cascadeIdentifier[index] = 1
 		for face in detected:
 			face = face.astype(int)
 			face = face.tolist()
 			detectedAll.append((face, cascadeIdentifier))
-
 	withoutDups = removeDuplicates(detectedAll)
 
 	for items in withoutDups:
@@ -63,6 +63,6 @@ def findFaces(img, mark=False):
 		#just for visual markers of each face
 		for items in withoutDups:
 			((x,y,w,h),cascadeIdentifier) = items[0] #could add a better way to choose the best box - biggest or average them
-			cv2.rectangle(img,(x,y),(x+w,y+h),(0,0,255),2)
+			cv2.rectangle(img.img,(x,y),(x+w,y+h),(0,0,255),2)
 
-	return convertToObjects(img, withoutDups)
+	img.persons = convertToObjects(img, withoutDups)
