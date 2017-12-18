@@ -37,13 +37,11 @@ def faceLandmarks(person, mark=False):
 	gray = cv2.cvtColor(person.image, cv2.COLOR_BGR2GRAY)
 
 	# determine the facial landmarks for the face region, then
-	# convert the facial landmark (x, y)-coordinates to a NumPy
-	# array
+	# convert the facial landmark (x, y)-coordinates to a NumPy array
 	landmarks = predictor(gray, rect)
 	landmarks = HelperFunctions.shape_to_np(landmarks)
 	person.landmarks = landmarks.tolist()
 	if mark:
 		# loop over the (x, y)-coordinates for the facial landmarks and draw them on the image
 		for (x, y) in landmarks:
-			print(str(x) + ', ' + str(person.face[3]))
 			cv2.circle(person.image, (x, y), 1, (0, 0, 255), -1)

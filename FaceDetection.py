@@ -60,6 +60,7 @@ def findFaces(img, mark=False):
 		items[0] = (items[0][0], overallCascadeIdentifier) #gives the first face (atm the one that gets used) the overall cascade identifier
 	
 	if mark:
+		print('mark')
 		#just for visual markers of each face
 		for items in withoutDups:
 			((x,y,w,h),cascadeIdentifier) = items[0] #could add a better way to choose the best box - biggest or average them

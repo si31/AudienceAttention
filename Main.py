@@ -60,6 +60,8 @@ def showAllPeople(persons):
 		key = cv2.waitKey(0)
 		if key == ord('q'):
 			break
+		elif key == ord('s'):
+			saveImage(person.image)
 
 def main():
 	print('"main", image name, use saved if available, create labels, view faces')	
@@ -75,7 +77,7 @@ def main():
 		FaceDetection.findFaces(img, mark=False)
 		print('Detecting landmarks...')
 		for person in img.persons:
-			ComputerVision.faceLandmarks(person, mark=True)
+			ComputerVision.faceLandmarks(person, mark=False)
 		saveToDatabase(img, imgName)
 
 	if sys.argv[3] == 'y':
