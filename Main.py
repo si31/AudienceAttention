@@ -4,6 +4,7 @@ import numpy as np
 import FaceDetection
 import ComputerVision
 import MachineLearning
+import HeadDirection
 import uuid
 import base64
 from Person import Person
@@ -78,6 +79,7 @@ def main():
 		print('Detecting landmarks...')
 		for person in img.persons:
 			ComputerVision.faceLandmarks(person, mark=False)
+			HeadDirection.getPose(person, img.img.shape)
 		saveToDatabase(img, imgName)
 
 	if sys.argv[3] == 'y':

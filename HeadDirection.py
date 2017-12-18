@@ -20,9 +20,9 @@ MODEL_POINTS_3D = np.array([(0.0, 0.0, 0.0),             # Nose tip
 
 
 #followed tutorial
-def getPose(person):
+def getPose(person, imgShape):
 	image = person.image
-	size = image.shape
+	size = imgShape
 	faceMarkers = np.array([tuple(person.landmarks[33]), tuple(person.landmarks[8]), tuple(person.landmarks[36]),
 					tuple(person.landmarks[45]), tuple(person.landmarks[48]), tuple(person.landmarks[54])], dtype="double")
 	focal_length = size[1] #needs to be replaced by the whole image's width
@@ -50,7 +50,7 @@ def setup():
 	face = (0,0,testImg.shape[0],testImg.shape[1])
 	person = Person(testImg, face, None)
 	ComputerVision.faceLandmarks(person, mark=True)
-	getPose(person)
+	getPose(person, person.image.shape)
 
 
 if __name__ == "__main__":
