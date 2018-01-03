@@ -13,3 +13,5 @@ class Person:
 		self.humanAttention = None
 		self.attention = None
 		self.humanFace = None
+		self.poseAngle = None
+		self.poseDistance = None

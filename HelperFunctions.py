@@ -41,7 +41,7 @@ def cropImage(img, person, extra):
 	(x,y,w,h) = person.face
 	x = max(0, x-extra)
 	y = max(0, y-extra)
-	h = h+extra*4
+	h = h+extra*2
 	w = w+extra*2
 
 	return img[y:y+h, x:x+w]

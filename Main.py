@@ -49,6 +49,11 @@ def fileToArray(imgName):
 def saveImage(img):
 	cv2.imwrite("/Users/admin/desktop/saved.jpg", img)
 
+def saveObject(obj):
+	print('Saving obj to desktop...')
+	with open("/Users/admin/desktop/saved.txt", 'wb') as f:
+		pickle.dump(obj, f)
+
 def showImage(img):
 	print('Showing image...')
 	cv2.imshow('image',img)
@@ -57,15 +62,15 @@ def showImage(img):
 def showAllPeople(persons):
 	print('Showing all people...')
 	for person in persons:
-		cv2.imshow('image',person.image)
+		cv2.imshow('image',person.imageExtra)
 		key = cv2.waitKey(0)
 		if key == ord('q'):
 			break
 		elif key == ord('s'):
-			saveImage(person.image)
+			saveObject(person)
 
 def main():
-	print('"main", image name, use saved if available, create labels, view faces')	
+	print('image name, use saved if available, create labels, view faces')	
 	print('Start...')
 
 	imgName = sys.argv[1]
@@ -79,7 +84,7 @@ def main():
 		print('Detecting landmarks...')
 		for person in img.persons:
 			ComputerVision.faceLandmarks(person, mark=False)
-			HeadDirection.getPose(person, img.img.shape)
+			HeadDirection.getPose(person, img.img.shape, mark=False)
 		saveToDatabase(img, imgName)
 
 	if sys.argv[3] == 'y':

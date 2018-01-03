@@ -5,6 +5,7 @@ import HelperFunctions
 from Person import Person
 import ComputerVision
 import dlib
+import math
 
 
 #standard relative points on a 3D head model
@@ -16,11 +17,9 @@ MODEL_POINTS_3D = np.array([(0.0, 0.0, 0.0),             # Nose tip
 							(150.0, -150.0, -125.0)      # Right mouth corner
 						 	])
 
-#camera calibration
-
 
 #followed tutorial
-def getPose(person, imgShape):
+def getPose(person, imgShape, mark=False):
 	image = person.image
 	size = imgShape
 	faceMarkers = np.array([tuple(person.landmarks[33]), tuple(person.landmarks[8]), tuple(person.landmarks[36]),
@@ -36,14 +35,17 @@ def getPose(person, imgShape):
 	(success, rotation_vector, translation_vector) = cv2.solvePnP(MODEL_POINTS_3D, faceMarkers, camera_matrix, dist_coeffs, flags=cv2.SOLVEPNP_ITERATIVE)
 	(nose_end_point2D, jacobian) = cv2.projectPoints(np.array([(0.0, 0.0, 1000.0)]), rotation_vector, translation_vector, camera_matrix, dist_coeffs)
 
-	for p in faceMarkers:
-		cv2.circle(person.image, (int(p[0]), int(p[1])), 3, (0,0,255), -1)
 
 	p1 = (int(faceMarkers[0][0]), int(faceMarkers[0][1]))
 	p2 = (int(nose_end_point2D[0][0][0]), int(nose_end_point2D[0][0][1]))
-	cv2.line(person.image, p1, p2, (255,0,0),2)
-	cv2.imshow('name', person.image)
-	cv2.waitKey(0)
+	p2relative = (p2[0]-p1[0], p2[1]-p1[1])
+	person.poseAngle = math.atan2(p2relative[1], p2relative[0])
+	person.poseDistance = math.sqrt(math.pow(p2relative[0], 2) + math.pow(p2relative[1], 2))
+
+	if mark:
+		cv2.line(person.image, p1, p2, (255,0,0),2)
+		for p in faceMarkers:
+			cv2.circle(person.image, (int(p[0]), int(p[1])), 3, (0,0,255), -1)
 
 def setup():
 	testImg = cv2.imread('HeadPoseTest/test1.jpg')
@@ -51,7 +53,3 @@ def setup():
 	person = Person(testImg, face, None)
 	ComputerVision.faceLandmarks(person, mark=True)
 	getPose(person, person.image.shape)
-
-
-if __name__ == "__main__":
-	setup()
