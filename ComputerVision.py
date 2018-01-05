@@ -48,10 +48,10 @@ def applyFilter(img, filterArray):
 
 def standardDeviationTwoImagesSingleChannel(img1, img2):
 	total = 0
-	for x in range(0,img1.shape[1]):
-		for y in range(0,img1.shape[0]):
+	for x in range(0,img1.shape[0]):
+		for y in range(0,img1.shape[1]):
 			total += math.pow(math.fabs(img1[x][y] - img2[x][y]),2)
-	total = total / (img1.shape[1] + img1.shape[0])
+	total = total / (img1.shape[0] + img1.shape[1])
 	return total
 
 def blur(image):
