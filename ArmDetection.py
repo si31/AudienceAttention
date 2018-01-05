@@ -81,29 +81,22 @@ def dominant_color(img):
 
 #from tutorial
 def detectSkin(person):
-	img = person.imageExtra 
+	img = person.imageExtra
 
-	cv2.imshow('name', person.image)
-	cv2.waitKey(0)
+	faceColour = dominant_color(cv2.cvtColor(person.image, cv2.COLOR_BGR2HSV))
+	lowerColourList = [x-25 for x in faceColour]
+	upperColourList = [x+75 for x in faceColour]
+	lower = np.array(lowerColourList)
+	upper = np.array(upperColourList)
 
-	faceColour = dominant_color(person.image)
-	print(faceColour)
-	lowerColour = [x-100 for x in faceColour]
-	upperColour = [x+100 for x in faceColour]
-	print(lowerColour)
-	print(upperColour)
+	hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+	skinMask = cv2.inRange(hsv, lower, upper)
 
-	lower = np.array(lowerColour, dtype = "uint8")
-	upper = np.array(upperColour, dtype = "uint8")
-
-	converted = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-	skinMask = cv2.inRange(img, lower, upper)
- 
 	# apply a series of erosions and dilations to the mask
 	# using an elliptical kernel
-	kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (11, 11))
-	skinMask = cv2.erode(skinMask, kernel, iterations = 2)
+	kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
 	skinMask = cv2.dilate(skinMask, kernel, iterations = 2)
+	skinMask = cv2.erode(skinMask, kernel, iterations = 2)
  
 	# blur the mask to help remove noise, then apply the
 	# mask to the frame
@@ -111,11 +104,29 @@ def detectSkin(person):
 	skin = cv2.bitwise_and(img, img, mask = skinMask)
  
 	# show the skin in the image along with the mask
-	cv2.imshow("name", np.hstack([img, skin]))
+	#cv2.imshow("name", np.hstack([img, skin]))
  
-	cv2.waitKey(0)
+	#cv2.waitKey(0)
 	return skin
 
+def detectSkin2(person):
+	img = person.image
+	chromed = cv2.cvtColor(img, cv2.COLOR_BGR2YUV)
+	mask = np.zeros(img.shape)
+
+	lower = np.array([25, 25, 25])
+	uppper = np.array([200,200,200])
+
+	hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+	skinMask = cv2.inRange(hsv, lower, upper)
+
+	skin = np.zeros(img.shape)
+	img =  cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+	skin = cv2.bitwise_and(img, img, mask = mask)
+
+	cv2.imshow('name', np.hstack([img, chromed, mask, skin]))
+	cv2.waitKey(0)
+	return mask
 
 def readFromDatabase(imgName):
 	print('Reading from database...')
@@ -124,12 +135,9 @@ def readFromDatabase(imgName):
 	return person
 
 
-def setup():
-	testPerson = readFromDatabase('ArmTest/arm5')
+def getSkin(person):
+	#sittingBodyShapeOnly(person)
+	skin = detectSkin(person)
+	person.skin = skin
+	#getArms(skin)
 
-	sittingBodyShapeOnly(testPerson)
-	skin = detectSkin(testPerson)
-	getArms(skin)
-
-if __name__ == "__main__":
-	setup()

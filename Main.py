@@ -5,6 +5,7 @@ import FaceDetection
 import ComputerVision
 import MachineLearning
 import HeadDirection
+import ArmDetection
 import uuid
 import base64
 from Person import Person
@@ -62,7 +63,10 @@ def showImage(img):
 def showAllPeople(persons):
 	print('Showing all people...')
 	for person in persons:
-		cv2.imshow('image',person.imageExtra)
+		print(person.image)
+		for x in range(0, person.image.shape[0]):
+			print(person.image[x])
+		cv2.imshow('image',	person.image)
 		key = cv2.waitKey(0)
 		if key == ord('q'):
 			break
@@ -70,7 +74,7 @@ def showAllPeople(persons):
 			saveObject(person)
 
 def main():
-	print('image name, use saved if available, create labels, view faces')	
+	print('image name, use saved if available, create labels, save to database, view faces')	
 	print('Start...')
 
 	imgName = sys.argv[1]
@@ -81,17 +85,22 @@ def main():
 	else:
 		img = Image(imgFile)
 		FaceDetection.findFaces(img, mark=False)
-		print('Detecting landmarks...')
+		print('Detecting landmarks, pose, skin, blur...')
 		for person in img.persons:
 			ComputerVision.faceLandmarks(person, mark=False)
 			HeadDirection.getPose(person, img.img.shape, mark=False)
+			person.blur = ComputerVision.blur(person.image)
+			ArmDetection.getSkin(person)
+		img.blur = ComputerVision.blur(img)
 		saveToDatabase(img, imgName)
 
 	if sys.argv[3] == 'y':
 		label(img)
-		saveToDatabase(img, imgName)
 
 	if sys.argv[4] == 'y':
+		saveToDatabase(img, imgName)
+
+	if sys.argv[5] == 'y':
 		showAllPeople(img.persons)
 
 	print('End')

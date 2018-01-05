@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 import dlib
 
+#based on tutorial / post
 def bbOverLapRatio(bb1, bb2):
 
 	[bb1x1,bb1y1,w,h] = bb1

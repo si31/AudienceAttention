@@ -7,3 +7,4 @@ class Image:
 	def __init__(self, img):
 		self.img = img
 		self.persons = None
+		self.blur = None

@@ -4,7 +4,8 @@ import numpy as np
 import EyeTracking
 import HelperFunctions
 import dlib
-
+import pickle
+import math
 
 def edgeDetection(person):
 	img = person.image
@@ -29,6 +30,37 @@ def showFaceImages(img, persons):
 			break
 
 
+def applyFilter(img, filterArray):
+	newImage = np.zeros(img.shape)
+	for x in range(0,img.shape[1]):
+		for y in range(0,img.shape[0]):
+			w = filterArray.shape[1]
+			h = filterArray.shape[0]
+			total = 0
+			for fx in range(0,w):
+				for fy in range(0,h):
+					xOffset = x+(fx-(w//2))
+					yOffset = y+(fy-(h//2)) #floor division
+					if xOffset >= 0 and xOffset < img.shape[1] and yOffset >= 0 and yOffset < img.shape[0]:
+						total += filterArray[fx][fy] * img[xOffset][yOffset]
+			newImage[x][y] = total
+	return newImage
+
+def standardDeviationTwoImagesSingleChannel(img1, img2):
+	total = 0
+	for x in range(0,img1.shape[1]):
+		for y in range(0,img1.shape[0]):
+			total += math.pow(math.fabs(img1[x][y] - img2[x][y]),2)
+	total = total / (img1.shape[1] + img1.shape[0])
+	return total
+
+def blur(image):
+	lapacian = np.array([[0,1,0],[1,-4,1],[0,1,0]])
+	gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+	filtered = applyFilter(gray, lapacian)
+	sd = standardDeviationTwoImagesSingleChannel(gray, filtered)
+	return blur
+
 def faceLandmarks(person, mark=False):
 	predictor = dlib.shape_predictor('shape_predictor_68_face_landmarks.dat')
 	
@@ -45,3 +77,15 @@ def faceLandmarks(person, mark=False):
 		# loop over the (x, y)-coordinates for the facial landmarks and draw them on the image
 		for (x, y) in landmarks:
 			cv2.circle(person.image, (x, y), 1, (0, 0, 255), -1)
+
+
+def readFromDatabase(imgName):
+	print('Reading from database...')
+	with open(imgName + '.txt', 'rb') as f:
+		person = pickle.load(f)
+	return person
+
+def main():
+	blur(readFromDatabase('ArmTest/arm1').image)
+if __name__ == "__main__":
+	main()

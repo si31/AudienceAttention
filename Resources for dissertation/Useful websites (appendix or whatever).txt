@@ -1,3 +1,6 @@
 head pose https://www.learnopencv.com/head-pose-estimation-using-opencv-and-dlib/
 canny https://www.pyimagesearch.com/2015/04/06/zero-parameter-automatic-canny-edge-detection-with-python-and-opencv/
 k-means image colour https://stackoverflow.com/questions/43111029/how-to-find-the-average-colour-of-an-image-in-python-with-opencv
+http://changingminds.org/techniques/body/attentive_body.htm
+https://en.wikipedia.org/wiki/Chrominance
+https://www.pyimagesearch.com/2015/09/07/blur-detection-with-opencv/
