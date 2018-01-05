@@ -32,16 +32,16 @@ def showFaceImages(img, persons):
 
 def applyFilter(img, filterArray):
 	newImage = np.zeros(img.shape)
-	for x in range(0,img.shape[1]):
-		for y in range(0,img.shape[0]):
-			w = filterArray.shape[1]
-			h = filterArray.shape[0]
+	for x in range(0,img.shape[0]):
+		for y in range(0,img.shape[1]):
+			w = filterArray.shape[0]
+			h = filterArray.shape[1]
 			total = 0
 			for fx in range(0,w):
 				for fy in range(0,h):
 					xOffset = x+(fx-(w//2))
 					yOffset = y+(fy-(h//2)) #floor division
-					if xOffset >= 0 and xOffset < img.shape[1] and yOffset >= 0 and yOffset < img.shape[0]:
+					if xOffset >= 0 and xOffset < img.shape[0] and yOffset >= 0 and yOffset < img.shape[1]:
 						total += filterArray[fx][fy] * img[xOffset][yOffset]
 			newImage[x][y] = total
 	return newImage

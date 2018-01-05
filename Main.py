@@ -84,14 +84,14 @@ def main():
 		img = readFromDatabase(imgName)
 	else:
 		img = Image(imgFile)
-		FaceDetection.findFaces(img, mark=False)
+		FaceDetection.findFaces(img, mark=True)
 		print('Detecting landmarks, pose, skin, blur...')
 		for person in img.persons:
 			ComputerVision.faceLandmarks(person, mark=False)
-			HeadDirection.getPose(person, img.img.shape, mark=False)
+			HeadDirection.getPose(person, img.image.shape, mark=False)
 			person.blur = ComputerVision.blur(person.image)
 			ArmDetection.getSkin(person)
-		img.blur = ComputerVision.blur(img)
+		img.blur = ComputerVision.blur(img.image)
 		saveToDatabase(img, imgName)
 
 	if sys.argv[3] == 'y':
@@ -101,6 +101,8 @@ def main():
 		saveToDatabase(img, imgName)
 
 	if sys.argv[5] == 'y':
+		showImage(img.image)
+		cv2.waitKey(0)
 		showAllPeople(img.persons)
 
 	print('End')
