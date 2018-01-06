@@ -1,0 +1,1 @@
+opencv_createsamples -img /Users/admin/Documents/AudienceAttention/Pos/img0.jpg -bg /Users/admin/Documents/AudienceAttention/Neg/bg.txt -info /home/user/annotations.lst -pngoutput -maxxangle 0.1 -maxyangle 0.1 -maxzangle 0.1

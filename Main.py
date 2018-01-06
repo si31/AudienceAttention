@@ -63,7 +63,6 @@ def showImage(img):
 def showAllPeople(persons):
 	print('Showing all people...')
 	for person in persons:
-		print(person.image)
 		for x in range(0, person.image.shape[0]):
 			print(person.image[x])
 		cv2.imshow('image',	person.image)
@@ -72,6 +71,10 @@ def showAllPeople(persons):
 			break
 		elif key == ord('s'):
 			saveObject(person)
+		elif key == ord('m'):
+			saveImage('')
+		elif key == ord('n'):
+			saveImage('')
 
 def main():
 	print('image name, use saved if available, create labels, save to database, view faces')	
