@@ -5,3 +5,4 @@ http://changingminds.org/techniques/body/attentive_body.htm
 https://en.wikipedia.org/wiki/Chrominance
 https://www.pyimagesearch.com/2015/09/07/blur-detection-with-opencv/
 http://note.sonots.com/SciSoftware/haartraining.html#w0a08ab4
+http://ieeexplore.ieee.org/document/4732544/

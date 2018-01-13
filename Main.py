@@ -57,14 +57,13 @@ def saveObject(obj):
 
 def showImage(img):
 	print('Showing image...')
+	img = cv2.resize(img, (1080, 540))  
 	cv2.imshow('image',img)
 	cv2.waitKey(0)
 
 def showAllPeople(persons):
 	print('Showing all people...')
 	for person in persons:
-		for x in range(0, person.image.shape[0]):
-			print(person.image[x])
 		cv2.imshow('image',	person.image)
 		key = cv2.waitKey(0)
 		if key == ord('q'):
@@ -77,12 +76,13 @@ def showAllPeople(persons):
 			saveImage('')
 
 def main():
-	print('image name, use saved if available, create labels, save to database, view faces')	
+	print('image name, use saved if available, create labels, save to database, view faces, calculate attention')	
 	print('Start...')
 
 	imgName = sys.argv[1]
 	imgFile = cv2.imread('imgsInDatabase/'+imgName)
 	img = None
+
 	if inDatabase(imgName) and sys.argv[2] == 'y':
 		img = readFromDatabase(imgName)
 	else:
@@ -95,7 +95,12 @@ def main():
 			person.blur = ComputerVision.blur(person.image)
 			ArmDetection.getSkin(person)
 		img.blur = ComputerVision.blur(img.image)
-		saveToDatabase(img, imgName)
+
+	if sys.argv[6] == 'y':
+		for person in img.persons:
+			person.accumulateData()
+			#need to load model and then use it to predict attention for each person
+			#need to pass image to the accumulate data function to allow it to get its blur for each section	
 
 	if sys.argv[3] == 'y':
 		label(img)
@@ -105,7 +110,6 @@ def main():
 
 	if sys.argv[5] == 'y':
 		showImage(img.image)
-		cv2.waitKey(0)
 		showAllPeople(img.persons)
 
 	print('End')

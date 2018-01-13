@@ -1,3 +1,28 @@
 opencv_createsamples -info /Users/admin/Documents/AudienceAttention/Haar/info.dat -vec /Users/admin/Documents/AudienceAttention/Haar/samples1.vec -w 20 -h 20
 
-opencv_createsamples -vec /Users/admin/Documents/AudienceAttention/Haar/samples1.vec -w 20 -h 20
+opencv_traincascade -data /Users/admin/Documents/AudienceAttention/Haar/Cascade -vec /Users/admin/Documents/AudienceAttention/Haar/samples1.vec -bg /Users/admin/Documents/AudienceAttention/Haar/bg.txt -nstages 5 -nsplits 2 -minhitrate 0.999 -maxfalsealarm 0.5 -npos 5 -nneg 10 -w 20 -h 20 -nonsym -mem 512 -mode ALL
+
+opencv_traincascade -data Cascade -vec samples1.vec -bg bg.txt -nstages 5 -nsplits 2 -minhitrate 0.999 -maxfalsealarm 0.5 -npos 5 -nneg 10 -w 20 -h 20 -nonsym -mem 512 -mode ALL
+
+mergence https://github.com/wulfebw/mergevec
+
+---
+
+from tutorial
+
+find ./Negative_Images -name '*.jpg' >negatives.dat
+find ./Positive_Images -name '*.jpg' >positives.dat
+
+perl createtrainsamples.pl positives.dat negatives.dat samples 250 "opencv_createsamples  -bgcolor 0 -bgthresh 0 -maxxangle 1.1 -maxyangle 1.1 maxzangle 0.2 -maxidev 20 -w 50 -h 30"
+
+find samples/ -name '*.vec' > samples.dat
+
+python mergevec.py -v samples -o samples.vec
+
+opencv_traincascade -data haarcascade -vec samples.vec -bg negatives.dat -numStages 20 -nsplits 2 -minHitRate 0.99 -maxFalseAlarmRate 0.25 -numPos 225 -numNeg 50 -w 50 -h 30 -mem 8192 -mode ALL
+
+view samples:
+opencv_createsamples -vec samples.vec -w 50 -h 50
+
+create samples with no distortions:
+find ./Positive_Images -name '*.jpg' -exec identify -format '%i 1 0 0 %w %h' \{\} \; > samples.dat

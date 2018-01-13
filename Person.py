@@ -17,3 +17,13 @@ class Person:
 		self.poseDistance = None
 		self.skin = None
 		self.blur = None
+		self.hands = None
+		self.leftLooking = None
+		self.rightLooking = None
+		self.data = []
+		self.cropped = None
+
+	def accumulateData():
+		print(poseAngle)
+		print(poseDistance)
+		self.data = [poseAngle, poseDistance, blur]

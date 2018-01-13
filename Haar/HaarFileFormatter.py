@@ -10,13 +10,13 @@ def main():
 		i += 1
 
 def main2():
-	with open('Haar/info.dat.txt', 'w+') as f:
-		path = "/Users/admin/Documents/AudienceAttention/Haar/Pos/"
+	with open('samples.dat', 'w+') as f:
+		path = "/Users/admin/Desktop/Haar_training/Positive_Images/"
 		for filename in os.listdir(path):
 			print(filename)
-			if filename.startswith("img") and filename != "img3.jpg":
+			if 'jpg' in filename:
 				img = cv2.imread(path+filename)
-				f.write("Pos/" + filename + " 1 0 0 " + str(img.shape[0]) + " " + str(img.shape[1]) + "\r\n")
+				f.write("Positive_Images/" + filename + " 1 0 0 " + str(img.shape[0]) + " " + str(img.shape[1]) + "\r\n")
 
 
 

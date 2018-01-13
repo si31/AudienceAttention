@@ -7,15 +7,10 @@ import dlib
 import pickle
 import math
 
-def edgeDetection(person):
-	img = person.image
+def edgeDetection(img):
 	imgray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
 	edges = cv2.Canny(img,100,150)
-	#cv2.imshow('title',edges)
-	#cv2.imshow('title2',img)
-	#keyPressed = cv2.waitKey()
-	#return not keyPressed == 113
-	return True
+	return edges
 
 def getCharacteristics(img, persons):
 	EyeTracking.findEyes(img, persons[0])

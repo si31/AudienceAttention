@@ -30,10 +30,9 @@ def getArms(img, mark=False):
 
 	pass
 
-def sittingBodyShapeOnly(person):
-	img = person.imageExtra
-	face = person.face
-	shape = img.shape
+def sittingBodyShapeOnly(imageExtra, face):
+	shape = imageExtra.shape
+	cropped = imageExtra.copy()
 	(xmax, ymax) = shape[0:2]
 	x1 = xmax/2 - face[3]/2
 	y1 = ymax/2
@@ -53,9 +52,9 @@ def sittingBodyShapeOnly(person):
 					img[x,y] = [255,192,203]
 				"""
 				if (x < f1):
-					img[x,y] = [0,0,0]					
+					cropped[x,y] = [0,0,0]					
 
-
+	return cropped
 	#cv2.imshow('name', img)
 	#cv2.waitKey(0)
 
@@ -128,6 +127,19 @@ def detectSkin2(person):
 	cv2.waitKey(0)
 	return mask
 
+def detectHands(img):
+	cascadePath = '/Users/admin/Desktop/Haar_training/haarcascade/cascade.xml'
+	cascade = cv2.CascadeClassifier(cascadePath)	
+	print('Detecting...')
+	detected = cascade.detectMultiScale(img, 1.2, 1)
+	print('Marking...')
+	for hand in detected:
+		(x,y,w,h) = hand
+		cv2.rectangle(img,(x,y),(x+w,y+h),(0,0,255),2)
+	img = cv2.resize(img, (960, 540))  
+	cv2.imshow('name',img)
+	cv2.waitKey(0)
+
 def readFromDatabase(imgName):
 	print('Reading from database...')
 	with open(imgName + '.txt', 'rb') as f:
@@ -140,4 +152,18 @@ def getSkin(person):
 	skin = detectSkin(person)
 	person.skin = skin
 	#getArms(skin)
+	person.cropped = sittingBodyShapeOnly(person.skin, person.face)
+	gray = cv2.cvtColor(person.cropped, cv2.COLOR_BGR2GRAY)
+	ret, thresh = cv2.threshold(gray, 1, 1, 1)
+	im2, contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+	largestContour = contours[0]
+	for cnt in contours:
+		if cnt.shape[0] > largestContour.shape[0]:
+			largestContour = cnt
+	#cv2.drawContours(person.cropped, [largestContour], 0, (0,255,0), 1 )
+	#cv2.imshow('name', ComputerVision.edgeDetection(person.cropped))
+	#cv2.waitKey(0)
+	return person.cropped
 
+if __name__ == "__main__":
+	detectHands(getSkin(readFromDatabase('ArmTest/arm5')))#cv2.imread('imgsInDatabase/test_front2.jpg'))#readFromDatabase('ArmTest/arm5').imageExtra)

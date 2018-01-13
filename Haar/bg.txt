@@ -5,7 +5,6 @@ img/img3.jpg
 img/img4.jpg
 img/img5.jpg
 img/img6.jpg
-img/img7.jpg
 img/img8.jpg
 img/img9.jpg
 img/img10.jpg
@@ -44,8 +43,3 @@ img/img42.jpg
 img/img43.jpg
 img/img44.jpg
 img/img45.jpg
-img/img46.jpg
-img/img47.jpg
-img/img48.jpg
-img/img49.jpg
-img/img50.jpg
