@@ -9,7 +9,7 @@ import math
 
 def edgeDetection(img):
 	imgray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-	edges = cv2.Canny(img,100,150)
+	edges = cv2.Canny(img,50,150)
 	return edges
 
 def getCharacteristics(img, persons):
@@ -41,20 +41,24 @@ def applyFilter(img, filterArray):
 			newImage[x][y] = total
 	return newImage
 
-def standardDeviationTwoImagesSingleChannel(img1, img2):
+def varianceTwoImagesSingleChannel(img1, img2):
+	totalSquares = 0
 	total = 0
 	for x in range(0,img1.shape[0]):
 		for y in range(0,img1.shape[1]):
-			total += math.pow(math.fabs(img1[x][y] - img2[x][y]),2)
-	total = total / (img1.shape[0] + img1.shape[1])
-	return total
+			totalSquares += math.pow((img1[x][y] - img2[x][y]),2)
+			total += (img1[x][y] - img2[x][y])
+	squaresAverage = totalSquares / (img1.shape[0] + img1.shape[1])
+	average = total / (img1.shape[0] + img1.shape[1])
+	sd = squaresAverage - math.pow(average,2)
+	return sd
 
 def blur(image):
 	lapacian = np.array([[0,1,0],[1,-4,1],[0,1,0]])
 	gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 	filtered = applyFilter(gray, lapacian)
-	sd = standardDeviationTwoImagesSingleChannel(gray, filtered)
-	return blur
+	sd = varianceTwoImagesSingleChannel(gray, filtered)
+	return sd
 
 def faceLandmarks(person, mark=False):
 	predictor = dlib.shape_predictor('shape_predictor_68_face_landmarks.dat')

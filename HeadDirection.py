@@ -10,9 +10,10 @@ import math
 
 #standard relative points on a 3D head model
 MODEL_POINTS_3D = np.array([(0.0, 0.0, 0.0),             # Nose tip
+							#(0.0, 170.0, -95.0)   # Nose Bridge
 							(0.0, -330.0, -65.0),        # Chin
 							(-225.0, 170.0, -135.0),     # Left eye left corner
-							(225.0, 170.0, -135.0),      # Right eye right corne
+							(225.0, 170.0, -135.0),      # Right eye right corner
 							(-150.0, -150.0, -125.0),    # Left Mouth corner
 							(150.0, -150.0, -125.0)      # Right mouth corner
 						 	])
@@ -25,7 +26,7 @@ def getPose(person, imgShape, mark=False):
 	faceMarkers = np.array([tuple(person.landmarks[33]), tuple(person.landmarks[8]), tuple(person.landmarks[36]),
 					tuple(person.landmarks[45]), tuple(person.landmarks[48]), tuple(person.landmarks[54])], dtype="double")
 	focal_length = size[1] #needs to be replaced by the whole image's width
-	center = (size[1]/2, size[0]/2)
+	center = (size[1]//2, size[0]//2)
 	camera_matrix = np.array([[focal_length, 0, center[0]],
 								[0, focal_length, center[1]],
 								[0,0,1]],

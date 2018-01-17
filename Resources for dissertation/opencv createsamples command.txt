@@ -8,18 +8,24 @@ mergence https://github.com/wulfebw/mergevec
 
 ---
 
+Annotation tool
+opencv_annotation --annotations=/Users/admin/Documents/AudienceAttention/Attention/img1.txt --images=/Users/admin/Documents/AudienceAttention/imgsInDatabase/img1.jpg
+
+
+---
+
 from tutorial
 
 find ./Negative_Images -name '*.jpg' >negatives.dat
 find ./Positive_Images -name '*.jpg' >positives.dat
 
-perl createtrainsamples.pl positives.dat negatives.dat samples 250 "opencv_createsamples  -bgcolor 0 -bgthresh 0 -maxxangle 1.1 -maxyangle 1.1 maxzangle 0.2 -maxidev 20 -w 50 -h 30"
+perl createtrainsamples.pl positives.dat negatives.dat samples 50 "opencv_createsamples  -bgcolor 0 -bgthresh 0 -maxxangle 0.5 -maxyangle 0.5 maxzangle 0.2 -maxidev 20 -w 50 -h 50"
 
 find samples/ -name '*.vec' > samples.dat
 
 python mergevec.py -v samples -o samples.vec
 
-opencv_traincascade -data haarcascade -vec samples.vec -bg negatives.dat -numStages 20 -nsplits 2 -minHitRate 0.99 -maxFalseAlarmRate 0.25 -numPos 225 -numNeg 50 -w 50 -h 30 -mem 8192 -mode ALL
+opencv_traincascade -data haarcascade -vec samples.vec -bg negatives.dat -numStages 20 -nsplits 2 -minHitRate 0.99 -maxFalseAlarmRate 0.25 -numPos 75 -numNeg 10 -w 50 -h 50 -mem 8192 -mode ALL
 
 view samples:
 opencv_createsamples -vec samples.vec -w 50 -h 50

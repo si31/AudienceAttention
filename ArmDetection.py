@@ -55,8 +55,7 @@ def sittingBodyShapeOnly(imageExtra, face):
 					cropped[x,y] = [0,0,0]					
 
 	return cropped
-	#cv2.imshow('name', img)
-	#cv2.waitKey(0)
+	
 
 #copied from stack overflow
 def dominant_color(img):
@@ -80,7 +79,7 @@ def dominant_color(img):
 
 #from tutorial
 def detectSkin(person):
-	img = person.imageExtra
+	img = person.image
 
 	faceColour = dominant_color(cv2.cvtColor(person.image, cv2.COLOR_BGR2HSV))
 	lowerColourList = [x-25 for x in faceColour]
@@ -88,8 +87,15 @@ def detectSkin(person):
 	lower = np.array(lowerColourList)
 	upper = np.array(upperColourList)
 
+	lower = np.array([0, 48, 80])
+	upper = np.array([20, 255, 255])
+
 	hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 	skinMask = cv2.inRange(hsv, lower, upper)
+
+	cv2.imshow(skinMask)
+	cv2.waitKey(0)
+
 
 	# apply a series of erosions and dilations to the mask
 	# using an elliptical kernel
@@ -127,18 +133,21 @@ def detectSkin2(person):
 	cv2.waitKey(0)
 	return mask
 
+
 def detectHands(img):
 	cascadePath = '/Users/admin/Desktop/Haar_training/haarcascade/cascade.xml'
 	cascade = cv2.CascadeClassifier(cascadePath)	
 	print('Detecting...')
-	detected = cascade.detectMultiScale(img, 1.2, 1)
+	detected = cascade.detectMultiScale(img, 1.01, 1)
 	print('Marking...')
 	for hand in detected:
 		(x,y,w,h) = hand
 		cv2.rectangle(img,(x,y),(x+w,y+h),(0,0,255),2)
-	img = cv2.resize(img, (960, 540))  
-	cv2.imshow('name',img)
+	img = cv2.resize(img, (1080, 540))  
+	cv2.imshow('img', img)
 	cv2.waitKey(0)
+	return img
+
 
 def readFromDatabase(imgName):
 	print('Reading from database...')
@@ -165,5 +174,7 @@ def getSkin(person):
 	#cv2.waitKey(0)
 	return person.cropped
 
+
 if __name__ == "__main__":
-	detectHands(getSkin(readFromDatabase('ArmTest/arm5')))#cv2.imread('imgsInDatabase/test_front2.jpg'))#readFromDatabase('ArmTest/arm5').imageExtra)
+	detectHands(cv2.imread('imgsInDatabase/img1.jpg'))#readFromDatabase('ArmTest/arm5').imageExtra)
+

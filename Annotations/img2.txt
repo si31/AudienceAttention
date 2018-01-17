@@ -1,0 +1,9 @@
+Faces in image by Human above 20x20: 51
+
+With improvements:
+True Positives: 30
+False Negatives: 4
+
+Without improvements:
+True Positives: 27
+False Negatives: 4

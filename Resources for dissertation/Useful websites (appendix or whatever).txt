@@ -6,3 +6,7 @@ https://en.wikipedia.org/wiki/Chrominance
 https://www.pyimagesearch.com/2015/09/07/blur-detection-with-opencv/
 http://note.sonots.com/SciSoftware/haartraining.html#w0a08ab4
 http://ieeexplore.ieee.org/document/4732544/
+https://pdfs.semanticscholar.org/8c67/5bf5b542b98bf81dcf70bd869ab52ab8aae9.pdf
+
+
+Extension: compare laplace kernels [111, 181, 111] for example.

@@ -57,7 +57,7 @@ def saveObject(obj):
 
 def showImage(img):
 	print('Showing image...')
-	img = cv2.resize(img, (1080, 540))  
+	img = cv2.resize(img, (1280, 960))  
 	cv2.imshow('image',img)
 	cv2.waitKey(0)
 
@@ -89,14 +89,15 @@ def main():
 		img = Image(imgFile)
 		FaceDetection.findFaces(img, mark=True)
 		print('Detecting landmarks, pose, skin, blur...')
-		for person in img.persons:
-			ComputerVision.faceLandmarks(person, mark=False)
-			HeadDirection.getPose(person, img.image.shape, mark=False)
-			person.blur = ComputerVision.blur(person.image)
-			ArmDetection.getSkin(person)
-		img.blur = ComputerVision.blur(img.image)
-
+		#for person in img.persons:
+			#ComputerVision.faceLandmarks(person, mark=False)
+			#HeadDirection.getPose(person, img.image.shape, mark=False)
+			#person.blur = ComputerVision.blur(person.image)
+			#hands = ComputerVision.edgeDetection(person.image)
+		print('Detecting image blur...')
+		#img.blur = ComputerVision.blur(img.image)
 	if sys.argv[6] == 'y':
+		print('Predicting attention...')
 		for person in img.persons:
 			person.accumulateData()
 			#need to load model and then use it to predict attention for each person
