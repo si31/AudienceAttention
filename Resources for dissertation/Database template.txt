@@ -1,0 +1,1 @@
+x|y|w|h|actual face (1 or 0)|head direction (x,y)|attention shown (1 or 0)|sx,sy|sx,sy|sx,sy

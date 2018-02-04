@@ -47,6 +47,24 @@ def cropImage(img, person, extra):
 
 	return img[y:y+h, x:x+w]
 
+def cropImageRatio(img, person, ratio):
+	(x,y,w,h) = person.face
+	extraX = int(ratio*(w//2))
+	extraY = int(ratio*(h//2))
+	x = max(0, x-extraX)
+	y = max(0, y-extraY)
+	wNew = w+extraX*2
+	hNew = h+extraY*2
+	if wNew + x < img.shape[1]:
+		w = wNew
+	else:
+		w = img.shape[1] - x
+	if hNew + y < img.shape[0]:
+		h = hNew
+	else:
+		h = img.shape[0] - y
+	return img[y:y+h, x:x+w]
+
 
 def dlibRectToBB(rect):
 	# take a bounding predicted by dlib and convert it

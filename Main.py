@@ -10,6 +10,7 @@ import uuid
 import base64
 from Person import Person
 from Image import Image
+from Video import Video
 import pickle
 
 def saveToDatabase(img, imgName):
@@ -75,12 +76,12 @@ def showAllPeople(persons):
 		elif key == ord('n'):
 			saveImage('')
 
-def main():
-	print('image name, use saved if available, create labels, save to database, view faces, calculate attention')	
-	print('Start...')
 
-	imgName = sys.argv[1]
-	imgFile = cv2.imread('imgsInDatabase/'+imgName)
+def handleImage(imgName, imgFile=None):
+	if imgFile is None:
+		print('Reading image...')
+		imgFile = cv2.imread('imgsInDatabase/'+imgName)
+	
 	img = None
 
 	if inDatabase(imgName) and sys.argv[2] == 'y':
@@ -89,11 +90,11 @@ def main():
 		img = Image(imgFile)
 		FaceDetection.findFaces(img, mark=True)
 		print('Detecting landmarks, pose, skin, blur...')
-		#for person in img.persons:
-			#ComputerVision.faceLandmarks(person, mark=False)
-			#HeadDirection.getPose(person, img.image.shape, mark=False)
-			#person.blur = ComputerVision.blur(person.image)
-			#hands = ComputerVision.edgeDetection(person.image)
+		for person in img.persons:
+			ComputerVision.faceLandmarks(person, mark=False)
+			HeadDirection.getPose(person, img.image.shape, mark=True)
+			person.blur = ComputerVision.blur(person.image)
+			#hands = ArmDetection.getSkin(person)
 		print('Detecting image blur...')
 		#img.blur = ComputerVision.blur(img.image)
 	if sys.argv[6] == 'y':
@@ -114,7 +115,40 @@ def main():
 		showAllPeople(img.persons)
 
 	print('End')
+	return img
 
+def handleVideo(vidName, frameInterval):
+	print('Reading video...')
+	cap = cv2.VideoCapture('imgsInDatabase/'+vidName)
 
+	video = Video()
+	i = 0
+
+	while(cap.isOpened()):
+		ret, frame = cap.read()
+		i += 1
+
+		if i % frameInterval != 0:
+			continue
+
+		video.frames.append(frame)
+		video.frameObjects.append(handleImage(vidName, frame))
+
+	cap.release()
+	cv2.destroyAllWindows()
+
+def main():
+	print('file name, use saved if available, create labels, save to database, view faces, calculate attention')	
+	print('Start...')
+
+	fileName = sys.argv[1]
+
+	if fileName.endswith('.jpg'):
+		handleImage(fileName)
+	elif fileName.endswith('.mp4'):
+		handleVideo(fileName, 10)
+	else:
+		print('Input file is of wrong type. Please use .jpg for images and .mp4 for videos.')
+	
 if __name__ == "__main__":
 	main()

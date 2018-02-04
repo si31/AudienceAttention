@@ -9,7 +9,7 @@ import math
 def convertToObjects(img, withoutDups):
 	persons = []
 	for face in withoutDups:
-		persons.append(Person(img.image, face[0],face[1])) #could add a better way to choose the best face
+		persons.append(Person(img.image, face[0], face[1])) #could add a better way to choose the best face
 	return persons
 
 

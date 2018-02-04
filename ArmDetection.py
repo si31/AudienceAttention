@@ -79,22 +79,24 @@ def dominant_color(img):
 
 #from tutorial
 def detectSkin(person):
-	img = person.image
+	img = person.imageExtra
 
 	faceColour = dominant_color(cv2.cvtColor(person.image, cv2.COLOR_BGR2HSV))
-	lowerColourList = [x-25 for x in faceColour]
-	upperColourList = [x+75 for x in faceColour]
+	lowerColourList = [x-20 for x in faceColour]
+	upperColourList = [x+20 for x in faceColour]
+	lowerColourList[2] = 0
+	upperColourList[2] = 255
 	lower = np.array(lowerColourList)
 	upper = np.array(upperColourList)
 
-	lower = np.array([0, 48, 80])
-	upper = np.array([20, 255, 255])
+	#lower = np.array([0,133,77])
+	#upper = np.array([255,173,127])
 
 	hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 	skinMask = cv2.inRange(hsv, lower, upper)
 
-	cv2.imshow(skinMask)
-	cv2.waitKey(0)
+	#cv2.imshow(skinMask)
+	#cv2.waitKey(0)
 
 
 	# apply a series of erosions and dilations to the mask
@@ -118,6 +120,8 @@ def detectSkin2(person):
 	img = person.image
 	chromed = cv2.cvtColor(img, cv2.COLOR_BGR2YUV)
 	mask = np.zeros(img.shape)
+
+	print(img.shape)
 
 	lower = np.array([25, 25, 25])
 	uppper = np.array([200,200,200])
@@ -161,20 +165,20 @@ def getSkin(person):
 	skin = detectSkin(person)
 	person.skin = skin
 	#getArms(skin)
-	person.cropped = sittingBodyShapeOnly(person.skin, person.face)
-	gray = cv2.cvtColor(person.cropped, cv2.COLOR_BGR2GRAY)
+	#person.cropped = sittingBodyShapeOnly(person.skin, person.face)
+	gray = cv2.cvtColor(person.skin, cv2.COLOR_BGR2GRAY)
 	ret, thresh = cv2.threshold(gray, 1, 1, 1)
 	im2, contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-	largestContour = contours[0]
-	for cnt in contours:
-		if cnt.shape[0] > largestContour.shape[0]:
-			largestContour = cnt
-	#cv2.drawContours(person.cropped, [largestContour], 0, (0,255,0), 1 )
+	#largestContour = contours[0]
+	#for cnt in contours:
+	#	if cnt.shape[0] > largestContour.shape[0]:
+	#		largestContour = cnt
+	cv2.drawContours(person.skin, contours, -1, (0,255,0), 1)
 	#cv2.imshow('name', ComputerVision.edgeDetection(person.cropped))
 	#cv2.waitKey(0)
-	return person.cropped
+	return person.skin
 
 
 if __name__ == "__main__":
-	detectHands(cv2.imread('imgsInDatabase/img1.jpg'))#readFromDatabase('ArmTest/arm5').imageExtra)
+	detectHands(cv2.imread('imgsInDatabase/test3.jpg'))#readFromDatabase('ArmTest/arm5').imageExtra)
 

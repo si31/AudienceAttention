@@ -1,5 +1,4 @@
 import sys
-import cv2
 import HelperFunctions 
 
 class Image:
@@ -8,3 +7,4 @@ class Image:
 		self.image = img
 		self.persons = None
 		self.blur = None
+		self.attention = None

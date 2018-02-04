@@ -8,7 +8,7 @@ class Person:
 		self.face = face
 		self.cascadeIdentifier = cascadeIdentifier
 		self.image = HelperFunctions.cropImage(img, self, 0)
-		self.imageExtra = HelperFunctions.cropImage(img, self, 50)
+		self.imageExtra = HelperFunctions.cropImageRatio(img, self, 2.5)
 		self.landmarks = []
 		self.humanAttention = None
 		self.attention = None

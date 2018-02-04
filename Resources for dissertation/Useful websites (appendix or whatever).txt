@@ -8,5 +8,9 @@ http://note.sonots.com/SciSoftware/haartraining.html#w0a08ab4
 http://ieeexplore.ieee.org/document/4732544/
 https://pdfs.semanticscholar.org/8c67/5bf5b542b98bf81dcf70bd869ab52ab8aae9.pdf
 
+HOGs/SVM
+https://pebbie.wordpress.com/2011/11/10/computing-hog-features-in-opencv-python/
+https://www.learnopencv.com/histogram-of-oriented-gradients/
+http://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_ml/py_svm/py_svm_opencv/py_svm_opencv.html#svm-opencv
 
 Extension: compare laplace kernels [111, 181, 111] for example.
