@@ -12,6 +12,7 @@ from Person import Person
 from Image import Image
 from Video import Video
 import pickle
+import HOG
 
 def saveToDatabase(img, imgName):
 	print('Saving to database...')
@@ -66,13 +67,14 @@ def showAllPeople(persons):
 	print('Showing all people...')
 	for person in persons:
 		cv2.imshow('image',	person.image)
+		cv2.imshow('hog', person.hogDrawing)
 		key = cv2.waitKey(0)
 		if key == ord('q'):
 			break
 		elif key == ord('s'):
 			saveObject(person)
 		elif key == ord('m'):
-			saveImage('')
+			saveImage(person.image)
 		elif key == ord('n'):
 			saveImage('')
 
@@ -88,12 +90,14 @@ def handleImage(imgName, imgFile=None):
 		img = readFromDatabase(imgName)
 	else:
 		img = Image(imgFile)
-		FaceDetection.findFaces(img, mark=True)
+		FaceDetection.findFaces(img, mark=False)
 		print('Detecting landmarks, pose, skin, blur...')
 		for person in img.persons:
 			ComputerVision.faceLandmarks(person, mark=False)
 			HeadDirection.getPose(person, img.image.shape, mark=True)
-			person.blur = ComputerVision.blur(person.image)
+			hogDrawing = HOG.getHOG(person.image)
+			person.hogDrawing = hogDrawing
+			#person.blur = ComputerVision.blur(person.image)
 			#hands = ArmDetection.getSkin(person)
 		print('Detecting image blur...')
 		#img.blur = ComputerVision.blur(img.image)

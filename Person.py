@@ -8,7 +8,7 @@ class Person:
 		self.face = face
 		self.cascadeIdentifier = cascadeIdentifier
 		self.image = HelperFunctions.cropImage(img, self, 0)
-		self.imageExtra = HelperFunctions.cropImageRatio(img, self, 2.5)
+		self.imageExtra = HelperFunctions.cropImageRatio(img, self, 0.25)
 		self.landmarks = []
 		self.humanAttention = None
 		self.attention = None
@@ -22,6 +22,7 @@ class Person:
 		self.rightLooking = None
 		self.data = []
 		self.cropped = None
+		self.hogDrawing = None
 
 	def accumulateData():
 		print(poseAngle)
