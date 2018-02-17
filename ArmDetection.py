@@ -139,7 +139,7 @@ def detectSkin2(person):
 
 
 def detectHands(img):
-	cascadePath = '/Users/admin/Desktop/Haar_training/haarcascade/cascade.xml'
+	cascadePath = '/Users/admin/Documents/AudienceAttention/haar_training/haarcascade/cascade.xml'
 	cascade = cv2.CascadeClassifier(cascadePath)	
 	print('Detecting...')
 	detected = cascade.detectMultiScale(img, 1.01, 1)
@@ -180,5 +180,5 @@ def getSkin(person):
 
 
 if __name__ == "__main__":
-	detectHands(cv2.imread('imgsInDatabase/test3.jpg'))#readFromDatabase('ArmTest/arm5').imageExtra)
+	detectHands(cv2.imread('imgsInDatabase/fake1.png'))#readFromDatabase('ArmTest/arm5').imageExtra)
 

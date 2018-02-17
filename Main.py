@@ -5,7 +5,7 @@ import FaceDetection
 import ComputerVision
 import MachineLearning
 import HeadDirection
-import ArmDetection
+import HAAR
 import uuid
 import base64
 from Person import Person
@@ -91,12 +91,13 @@ def handleImage(imgName, imgFile=None):
 	else:
 		img = Image(imgFile)
 		FaceDetection.findFaces(img, mark=False)
-		print('Detecting landmarks, pose, skin, blur...')
+		print('Detecting landmarks, head pose, occlusion, blur, posture...')
 		for person in img.persons:
 			ComputerVision.faceLandmarks(person, mark=False)
-			HeadDirection.getPose(person, img.image.shape, mark=True)
-			hogDrawing = HOG.getHOG(person.image)
-			person.hogDrawing = hogDrawing
+			HeadDirection.getPose(person, img.image.shape, mark=False)
+			#print(HAAR.detectFromCascade([person.imageExtra]))
+			#cv2.imshow('img', person.imageExtra)
+			#cv2.waitKey(0)
 			#person.blur = ComputerVision.blur(person.image)
 			#hands = ArmDetection.getSkin(person)
 		print('Detecting image blur...')

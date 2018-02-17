@@ -16,7 +16,7 @@ GAMMA=5.383
 height = 128
 width = 128
 
-cellsize = 4
+cellsize = 8
 
 viewRatio = 3
 
@@ -91,7 +91,9 @@ def svmTrain(trainData, labels):
 	svm.setGamma(GAMMA)
 	#trainingSequence = [(hogdata[i],labels[i]) for i in range(0, len(labels))]
 	assert(len(hogdata) == len(labels))
-
+	print(hogdata.shape)
+	#hogdata = hogdata.reshape(-1,64)
+	print(hogdata.shape)
 	svm.train(hogdata, cv2.ml.ROW_SAMPLE, labels)
 	svm.save('svm_data.dat')
 	return svm
@@ -114,14 +116,14 @@ def collectImages():
 	num_neg = 196
 	for i in range(0, math.floor((num_pos/10)*9)):
 		#load image
-		img = cv2.imread('occluded_positive/faces/side/' + str(i) + '.png')
+		img = cv2.imread('occluded_positive/faces/' + str(i) + '.png')
 		#images 
 		if img is None:
 			continue
 		imagesPosTrain.append(img)
 	for i in range(math.floor((num_pos/10)*9), num_pos+1):
 		#load image
-		img = cv2.imread('occluded_positive/faces/side/' + str(i) + '.png')
+		img = cv2.imread('occluded_positive/faces/' + str(i) + '.png')
 		#images 
 		if img is None:
 			continue
@@ -233,6 +235,7 @@ def main():
 	half = False
 	global height
 	imagesPosTrain, imagesPosTest, imagesNegTrain, imagesNegTest = collectImages()
+	print(len(imagesPosTrain))
 	if half:
 		height = int(height/2)
 		imagesPosTrain = shuffle([img[int(img.shape[1]/2):img.shape[1], 0:img.shape[0]] for img in imagesPosTrain])
@@ -247,7 +250,7 @@ def main():
 			if char == ord('q'):
 				break
 	else:
-		labels = [1 for i in imagesPosTrain] + [0 for i in imagesNegTrain]
+		labels = [1 for i in imagesPosTrain] + [-1 for i in imagesNegTrain]
 		svm = svmTrain(imagesPosTrain + imagesNegTrain, labels)
 		result = svmTest(svm, imagesPosTest)
 		print(result[1].tolist())
