@@ -28,19 +28,14 @@ def showPAFs(PAFs, startIdx=0, endIdx=16):
 
 
 def getPosture(img):
-
-	download_heatmaps = False
-
-	# with_face = with_hands = False
-	# op = OP.OpenPose((656, 368), (368, 368), (1280, 720), "COCO", OPENPOSE_ROOT + os.sep + "models" + os.sep, 0,
-	#                  download_heatmaps, OP.OpenPose.ScaleMode.ZeroToOne, with_face, with_hands)
 	
-	op = OP.OpenPose((320, 240), (240, 240), (640, 480), "COCO", OPENPOSE_ROOT + os.sep + "models" + os.sep, 0, download_heatmaps)
+	op = OP.OpenPose((320, 240), (240, 240), (640, 480), "COCO", OPENPOSE_ROOT + os.sep + "models" + os.sep, 0, False)
  
 	op.detectPose(img.image)
 	print("POINTS")
-	for thing in op.getKeypoints(op.KeypointType.POSE):
+	for thing in op.getKeypoints(op.KeypointType.POSE)[0]:
 		print(thing)
+	print('next')
 	#op.detectFace(rgb)
 	op.detectHands(img.image)
 
