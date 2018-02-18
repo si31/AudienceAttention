@@ -24,7 +24,7 @@ class Person:
 		self.poseAngle = None
 		self.poseDistance = None
 		self.postureLR = None
-		self.postureFB = None
+		self.occlusion = None
 		self.attention = None
 
 		#not sure about these
@@ -35,9 +35,9 @@ class Person:
 
 
 	def accumulateData():
-		print(poseAngle)
-		print(poseDistance)
-		self.data = [poseAngle, poseDistance, blur]
+		#probably need to be more selective and refined
+		self.data = [self.blur, self.poseAngle, self.poseDistance, self.postureLR, self.occlusion, self.attention]
+
 
 class LabelsForPerson:
 
@@ -49,5 +49,5 @@ class LabelsForPerson:
 		self.humanPoseAngle = None # participant estimated angle
 		self.humanEyeAngle = None # participant estimated eye gaze angle
 		self.humanPostureLR = None # participant estimated left to right posture
-		self.humanPostureFB = None # participant estimated forward to back posture
+		self.humanOcclusion = None # participant estimated occlusion
 		self.humanAttention = None # participant estimated human attention
