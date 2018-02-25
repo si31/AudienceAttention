@@ -100,9 +100,15 @@ def runImage():
 		b0 = tk.Button(text="Person is not moving", command=lambda: nextImage(0))
 		elementsToPack = [b1, b0]
 	elif phase == 5:
-		#buttons to select face
-		b1 = tk.Button(text="Is a face", command=lambda: nextImage(1))
-		b0 = tk.Button(text="Is not a face", command=lambda: nextImage(0))
+		#buttons to select occlusion
+		b1 = tk.Button(text="Occluded", command=lambda: nextImage(1))
+		b0 = tk.Button(text="Not occluded", command=lambda: nextImage(0))
+		elementsToPack = [b1, b0]
+	elif phase == 6:
+		#buttons to select postureLR
+		b2 = tk.Button(text="Left posture", command=lambda: nextImage(2))
+		b1 = tk.Button(text="Centre posture", command=lambda: nextImage(1))
+		b0 = tk.Button(text="Right posture", command=lambda: nextImage(0))
 		elementsToPack = [b1, b0]
 	for element in elementsToPack:
 		element.pack()
@@ -140,9 +146,16 @@ def nextImage(val):
 		labelsForPerson.humanEyeAngle = val
 	elif phase == 4:
 		labelsForPerson.humanMovement = val
-
-	if phase == 4: # max phase number
+	elif phase == 5:
+		labelsForPerson.humanOcclusion = val
+	elif phase == 6:
+		labelsForPerson.humanPostureLR = val
+	if phase == 5: # max phase number
 		index += 1
+		labelsForPerson.data = [labelsForPerson.humanEyeAngle, labelsForPerson.humanMovement, labelsForPerson.humanOcclusion, labelsForPerson.humanPostureLR]
+		if index > len(img.persons)-1:
+			saveToDatabase(img, sys.argv[1])
+			exit()
 		phase = 0
 	else:
 		phase += 1
@@ -160,14 +173,40 @@ labelIdentifier = ""
 
 def main():
 	
-	global img, labelIdentifier, root
+	global img, labelIdentifier, root, index
+	print('Usage: imgName, command, label identifier')
 	img = readFromDatabase(sys.argv[1])
-	labelIdentifier = sys.argv[2]
+	command = sys.argv[2]
 
-	root = tk.Tk()  
-	root.title("Audience Attention Labeller")
+	if command == "ls":
+		examplePerson = img.persons[0]
+		identifiers = [label.labelIdentifier for label in examplePerson.labels]
+		if len(identifiers) == 0:
+			print('no identifiers found')
+		else:
+			print('--')
+			for identifier in identifiers:
+				print(identifier)
+			print('--')
 
-	runImage()
+	elif command == "clear-make-sure":
+		for person in img.persons:
+			person.labels = []
+		saveToDatabase(img, sys.argv[1])
+
+	elif command == "new":
+		labelIdentifier = sys.argv[3]
+		root = tk.Tk()  
+		root.title("Audience Attention Labeller")
+		runImage()
+
+	elif command == "delete":	
+		labelIdentifier = sys.argv[3]
+		for person in img.persons:
+			for label in person.labels:
+				if label.labelIdentifier == labelIdentifier:
+					person.labels.remove(label)
+		saveToDatabase(img, sys.argv[1])
 
 	print('End')
 	return

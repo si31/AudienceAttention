@@ -51,3 +51,5 @@ class LabelsForPerson:
 		self.humanPostureLR = None # participant estimated left to right posture
 		self.humanOcclusion = None # participant estimated occlusion
 		self.humanAttention = None # participant estimated human attention
+		#accumulated data
+		self.data = [] #includes the 4 features of movement, eye angle, posture and occlusion
