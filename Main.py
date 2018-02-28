@@ -66,7 +66,8 @@ def showAllPeople(persons):
 	print('Showing all people...')
 	for person in persons:
 		cv2.imshow('image',	person.image)
-		cv2.imshow('hog', person.hogDrawing)
+		person.accumulateData()
+		print(person.data)
 		key = cv2.waitKey(0)
 		if key == ord('q'):
 			break

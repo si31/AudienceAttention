@@ -55,7 +55,9 @@ def runImage():
 
 	imgPIL = PILIm.fromarray(person.imageExtra)
 	imgTk = ImageTk.PhotoImage(imgPIL)
-	imgView = tk.Label(image=imgTk)  
+	imgView = tk.Label(image=imgTk)
+	label = tk.Label(text=str(index))
+	label.pack()
 	imgView.pack()
 
 	elementsToPack = []
@@ -100,10 +102,16 @@ def runImage():
 		b0 = tk.Button(text="Person is not moving", command=lambda: nextImage(0))
 		elementsToPack = [b1, b0]
 	elif phase == 5:
-		#buttons to select face
-		b1 = tk.Button(text="Is a face", command=lambda: nextImage(1))
-		b0 = tk.Button(text="Is not a face", command=lambda: nextImage(0))
+		#buttons to select occlusion
+		b1 = tk.Button(text="Occluded", command=lambda: nextImage(1))
+		b0 = tk.Button(text="Not occluded", command=lambda: nextImage(0))
 		elementsToPack = [b1, b0]
+	elif phase == 6:
+		#buttons to select postureLR
+		b2 = tk.Button(text="Left posture", command=lambda: nextImage(2))
+		b1 = tk.Button(text="Centre posture", command=lambda: nextImage(1))
+		b0 = tk.Button(text="Right posture", command=lambda: nextImage(0))
+		elementsToPack = [b2, b1, b0]
 	for element in elementsToPack:
 		element.pack()
 	root.mainloop()
@@ -130,8 +138,7 @@ def nextImage(val):
 		labelsForPerson = getLabelObject(person)
 		labelsForPerson.humanFace = val
 		if val == 0:
-			index += 1
-			phase = 0
+			phase = 1 
 	elif phase == 1:
 		labelsForPerson.humanAttention = val
 	elif phase == 2:
@@ -140,15 +147,23 @@ def nextImage(val):
 		labelsForPerson.humanEyeAngle = val
 	elif phase == 4:
 		labelsForPerson.humanMovement = val
-
-	if phase == 4: # max phase number
+	elif phase == 5:
+		labelsForPerson.humanOcclusion = val
+	elif phase == 6:
+		labelsForPerson.humanPostureLR = val
+	if phase == 1: # max phase number
 		index += 1
+		#labelsForPerson.data = [labelsForPerson.humanEyeAngle, labelsForPerson.humanMovement, labelsForPerson.humanOcclusion, labelsForPerson.humanPostureLR]
+		saveToDatabase(img, sys.argv[1])
+		if index > len(img.persons)-1:
+			exit()
 		phase = 0
 	else:
 		phase += 1
 	root.destroy()
 	root = tk.Tk()
-	root.title("Audience Attention Labeller") 
+	root.title("Audience Attention Labeller")
+	root.geometry('500x500+700+300')
 	runImage() 
 
 
@@ -160,14 +175,43 @@ labelIdentifier = ""
 
 def main():
 	
-	global img, labelIdentifier, root
+	global img, labelIdentifier, root, index
+	print('Usage: imgName, command, label identifier, startFrom')
 	img = readFromDatabase(sys.argv[1])
-	labelIdentifier = sys.argv[2]
+	command = sys.argv[2]
 
-	root = tk.Tk()  
-	root.title("Audience Attention Labeller")
+	print(len(img.persons))
 
-	runImage()
+	if command == "ls":
+		examplePerson = img.persons[0]
+		identifiers = [label.labelIdentifier for label in examplePerson.labels]
+		if len(identifiers) == 0:
+			print('no identifiers found')
+		else:
+			print('--')
+			for identifier in identifiers:
+				print(identifier)
+			print('--')
+
+	elif command == "clear-make-sure":
+		for person in img.persons:
+			person.labels = []
+		saveToDatabase(img, sys.argv[1])
+
+	elif command == "new":
+		labelIdentifier = sys.argv[3]
+		root = tk.Tk()  
+		root.title("Audience Attention Labeller")
+		index = int(sys.argv[4])
+		runImage()
+
+	elif command == "delete":	
+		labelIdentifier = sys.argv[3]
+		for person in img.persons:
+			for label in person.labels:
+				if label.labelIdentifier == labelIdentifier:
+					person.labels.remove(label)
+		saveToDatabase(img, sys.argv[1])
 
 	print('End')
 	return
