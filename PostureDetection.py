@@ -29,6 +29,7 @@ def runOP(img):
 	#res = op.render(img) #get OP to render the body positions onto the image
 	dataOP = op.getKeypoints(op.KeypointType.POSE)[0]
 	dataOP = dataOP.tolist()
+
 	faces = op.faceRects.tolist()
 	hands = op.handRects.tolist()
 	personOPPointss = []
@@ -75,7 +76,7 @@ class PersonOPPoints:
 		self.rightElbow = keypoints[6]
 		self.rightHand = keypoints[7]
 		self.bottomLeftBody = keypoints[8]
-		self.leftKnee = keypoints[9] #might be foot
+		self.leftKnee = keypoints[9] #cant see
 		self.leftFoot = keypoints[10] #cant see
 		self.bottomRightBody = keypoints[11]
 		self.rightKnee = keypoints[12]

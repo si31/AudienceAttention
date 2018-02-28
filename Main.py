@@ -1,18 +1,23 @@
 import sys
 import cv2
 import numpy as np
+import uuid
+import base64
+import pickle
+import HOG
+import time
+
 import FaceDetection
 import ComputerVision
 import MachineLearning
 import HeadDirection
+import PostureDetection
 import HAAR
-import uuid
-import base64
+
 from Person import Person
 from Image import Image
 from Video import Video
-import pickle
-import HOG
+
 
 def saveToDatabase(img, imgName):
 	print('Saving to database...')
@@ -110,7 +115,7 @@ def handleImage(imgName, imgFile=None):
 				img = Image(imgFile)
 				FaceDetection.findFaces(img, mark=False)
 			detectFeatures(img)
-		detectAttention(img.persons)
+		calculateAttention(img.persons)
 
 	if sys.argv[3] == '1':
 		saveToDatabase(img, imgName)
@@ -143,17 +148,22 @@ def handleVideo(vidName, frameInterval):
 	cv2.destroyAllWindows()
 
 def main():
-	print('Parameter format: file name, use saved if available (3=used saved everything, 2=used saved redo attention, 1=used saved faces, 0=redo everything), save to database, view faces')	
+	print('Usage: file name, use saved if available (3=used saved everything, 2=used saved redo attention, 1=used saved faces, 0=redo everything), save to database, view faces')	
 	print('Start...')
+	
+	if len(sys.argv) < 5:
+		print('Not enough parameters specified')
+		return
 
 	fileName = sys.argv[1]
-
+	time1 = time.gmtime(0)
 	if fileName.endswith('.jpg') or fileName.endswith('.png'):
 		handleImage(fileName)
 	elif fileName.endswith('.mp4'):
 		handleVideo(fileName, 10)
 	else:
 		print('Input file is of wrong type. Please use .jpg or .png for images and .mp4 for videos.')
-	
+	print(time.gmtime(0)-time1)
+
 if __name__ == "__main__":
 	main()
