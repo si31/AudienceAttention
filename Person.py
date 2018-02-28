@@ -28,7 +28,6 @@ class Person:
 		self.attention = None
 
 		#not sure about these
-		self.hands = None
 		self.leftLooking = None
 		self.rightLooking = None
 		self.cropped = None
