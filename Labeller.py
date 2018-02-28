@@ -55,7 +55,9 @@ def runImage():
 
 	imgPIL = PILIm.fromarray(person.imageExtra)
 	imgTk = ImageTk.PhotoImage(imgPIL)
-	imgView = tk.Label(image=imgTk)  
+	imgView = tk.Label(image=imgTk)
+	label = tk.Label(text=str(index))
+	label.pack()
 	imgView.pack()
 
 	elementsToPack = []
@@ -109,7 +111,7 @@ def runImage():
 		b2 = tk.Button(text="Left posture", command=lambda: nextImage(2))
 		b1 = tk.Button(text="Centre posture", command=lambda: nextImage(1))
 		b0 = tk.Button(text="Right posture", command=lambda: nextImage(0))
-		elementsToPack = [b1, b0]
+		elementsToPack = [b2, b1, b0]
 	for element in elementsToPack:
 		element.pack()
 	root.mainloop()
@@ -136,8 +138,7 @@ def nextImage(val):
 		labelsForPerson = getLabelObject(person)
 		labelsForPerson.humanFace = val
 		if val == 0:
-			index += 1
-			phase = 0
+			phase = 1 
 	elif phase == 1:
 		labelsForPerson.humanAttention = val
 	elif phase == 2:
@@ -150,18 +151,19 @@ def nextImage(val):
 		labelsForPerson.humanOcclusion = val
 	elif phase == 6:
 		labelsForPerson.humanPostureLR = val
-	if phase == 5: # max phase number
+	if phase == 1: # max phase number
 		index += 1
-		labelsForPerson.data = [labelsForPerson.humanEyeAngle, labelsForPerson.humanMovement, labelsForPerson.humanOcclusion, labelsForPerson.humanPostureLR]
+		#labelsForPerson.data = [labelsForPerson.humanEyeAngle, labelsForPerson.humanMovement, labelsForPerson.humanOcclusion, labelsForPerson.humanPostureLR]
+		saveToDatabase(img, sys.argv[1])
 		if index > len(img.persons)-1:
-			saveToDatabase(img, sys.argv[1])
 			exit()
 		phase = 0
 	else:
 		phase += 1
 	root.destroy()
 	root = tk.Tk()
-	root.title("Audience Attention Labeller") 
+	root.title("Audience Attention Labeller")
+	root.geometry('500x500+700+300')
 	runImage() 
 
 
@@ -174,9 +176,11 @@ labelIdentifier = ""
 def main():
 	
 	global img, labelIdentifier, root, index
-	print('Usage: imgName, command, label identifier')
+	print('Usage: imgName, command, label identifier, startFrom')
 	img = readFromDatabase(sys.argv[1])
 	command = sys.argv[2]
+
+	print(len(img.persons))
 
 	if command == "ls":
 		examplePerson = img.persons[0]
@@ -198,6 +202,7 @@ def main():
 		labelIdentifier = sys.argv[3]
 		root = tk.Tk()  
 		root.title("Audience Attention Labeller")
+		index = int(sys.argv[4])
 		runImage()
 
 	elif command == "delete":	
