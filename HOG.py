@@ -50,7 +50,22 @@ def convertImage(img):
 			for x in range(0,cellsize):
 				for y in range(0,cellsize):
 					histogramBins[int(angle[i*cellsize+x, j*cellsize+y] / 40)] += mag[i*cellsize+x, j*cellsize+y]
-			hog.append(histogramBins)
+			hog += (histogramBins)
+
+	#normalisation
+	for i in range(0, width//(cellsize*2) + height//(cellsize*2)):
+		normalisationRange = hog[i*18:(i+1)*18] + hog[(i*18+(9*(width//cellsize))):i*18+(9*(width//cellsize))]
+		print(normalisationRange)
+		length = 0
+		for val in normalisationRange:
+			length += math.pow(val,2)
+		length = math.sqrt(length)
+		for j in range(i*18, (i+1)*18):
+			hog[j] = hog[j] / length
+		normalisationRange = hog[i*18:(i+1)*18]
+		print(normalisationRange)
+
+
 	return np.array(hog)
 
 """
@@ -216,8 +231,8 @@ def disturbance(img, hog):
 
 def main():
 	print('Start...')
-	"""
-	img = cv2.imread('occluded_positive/faces/25.png')
+	
+	img = cv2.imread('occluded_positive/faces/31.png')
 	img = cv2.resize(img, (width,height), interpolation=cv2.INTER_LINEAR);
 	hog = convertImage(img)
 	blackBG = True
@@ -254,7 +269,7 @@ def main():
 		svm = svmTrain(imagesPosTrain + imagesNegTrain, labels)
 		result = svmTest(svm, imagesPosTest)
 		print(result[1].tolist())
-	
+	"""
 	
 	
 if __name__ == "__main__":
