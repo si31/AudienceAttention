@@ -26,6 +26,7 @@ MODEL_POINTS_3D = np.array([(0.0, 0.0, 0.0),             # Sellion
 							(59.5, -5.0, -20.0),      # Right eye right corner
 							(-69.5, -21.0, -96.5),    # Left face
 							(69.5, -21.0, -96.5)      # Right face
+							(0.0, -72.0, 20.0) # Middle of mouth
 						 	])
 
 #followed tutorial
