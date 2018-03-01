@@ -9,21 +9,30 @@ import math
 
 
 #standard relative points on a 3D head model
+""" #from learn opencv site
 MODEL_POINTS_3D = np.array([(0.0, 0.0, 0.0),             # Nose tip
-							#(0.0, 170.0, -95.0)   # Nose Bridge
 							(0.0, -330.0, -65.0),        # Chin
 							(-225.0, 170.0, -135.0),     # Left eye left corner
 							(225.0, 170.0, -135.0),      # Right eye right corner
 							(-150.0, -150.0, -125.0),    # Left Mouth corner
 							(150.0, -150.0, -125.0)      # Right mouth corner
 						 	])
-
+"""
+#my calcs from wiki page
+MODEL_POINTS_3D = np.array([(0.0, 0.0, 0.0),             # Sellion
+							(0.0, -42.0, 22.0),        # Nosetip
+							(0.0, -117.5, 0.0),        # Chin
+							(-59.5, -5.0, -20.0),     # Left eye left corner
+							(59.5, -5.0, -20.0),      # Right eye right corner
+							(-69.5, -21.0, -96.5),    # Left face
+							(69.5, -21.0, -96.5)      # Right face
+						 	])
 
 #followed tutorial
 def getPose(person, imgShape, mark=False):
 	image = person.image
 	size = imgShape
-	faceMarkers = np.array([tuple(person.landmarks[33]), tuple(person.landmarks[8]), tuple(person.landmarks[36]),
+	faceMarkers = np.array([tuple(person.landmarks[30]), tuple(person.landmarks[8]), tuple(person.landmarks[36]),
 					tuple(person.landmarks[45]), tuple(person.landmarks[48]), tuple(person.landmarks[54])], dtype="double")
 	focal_length = size[1] #needs to be replaced by the whole image's width
 	center = (size[1]//2, size[0]//2)
