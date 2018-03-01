@@ -19,26 +19,29 @@ MODEL_POINTS_3D = np.array([(0.0, 0.0, 0.0),             # Nose tip
 						 	])
 """
 #my calcs from wiki page
-MODEL_POINTS_3D = np.array([(0.0, 0.0, 0.0),             # Sellion
-							(0.0, -42.0, 22.0),        # Nosetip
-							(0.0, -117.5, 0.0),        # Chin
-							(-59.5, -5.0, -20.0),     # Left eye left corner
-							(59.5, -5.0, -20.0),      # Right eye right corner
-							(-69.5, -21.0, -96.5),    # Left face
-							(69.5, -21.0, -96.5)      # Right face
-							(0.0, -72.0, 20.0) # Middle of mouth
+MODEL_POINTS_3D = np.array([(0.0, 0.0, 0.0),            # Sellion
+							(0.0, -42.0, 22.0),        	# Nosetip
+							(0.0, -117.5, 0.0),        	# Chin
+							(-59.5, -5.0, -20.0),     	# Left eye left corner
+							(59.5, -5.0, -20.0),      	# Right eye right corner
+							(-69.5, -21.0, -96.5),    	# Left face
+							(69.5, -21.0, -96.5),      	# Right face
+							(0.0, -72.0, 20.0) 		  	# Middle of mouth
 						 	])
 
 #followed tutorial
 def getPose(person, imgShape, mark=False):
 	image = person.image
 	size = imgShape
+	""" #from learn opencv site
 	faceMarkers = np.array([tuple(person.landmarks[30]), tuple(person.landmarks[8]), tuple(person.landmarks[36]),
 					tuple(person.landmarks[45]), tuple(person.landmarks[48]), tuple(person.landmarks[54])], dtype="double")
-	for landmark in faceMarkers:
-		print(landmark)
-		if landmark[0] == 0 and landmark[1] == 0:
-			print(poo)
+	"""
+	# from wiki calcs
+	faceMarkers = np.array([tuple(person.landmarks[27]), tuple(person.landmarks[30]), tuple(person.landmarks[8]),
+					tuple(person.landmarks[36]), tuple(person.landmarks[45]), tuple(person.landmarks[1]), 
+					tuple(person.landmarks[15]), tuple(person.landmarks[62])], dtype="double")
+
 	focal_length = size[1]
 	center = (size[1]//2, size[0]//2)
 	camera_matrix = np.array([[focal_length, 0, center[0]],
@@ -58,9 +61,16 @@ def getPose(person, imgShape, mark=False):
 	person.poseDistance = math.sqrt(math.pow(p2relative[0], 2) + math.pow(p2relative[1], 2))
 
 	if mark:
+		draw(img, MODEL_POINTS_3D[0], nose_end_point2D)
+		"""
 		cv2.line(person.image, p1, p2, (255,0,0),2)
 		for p in faceMarkers:
 			cv2.circle(person.image, (int(p[0]), int(p[1])), 3, (0,0,255), -1)
+		"""
+def draw(img, origin, points):
+	img = cv2.line(img, origin, tuple(points[0].ravel()), (255,0,0), 5)
+	img = cv2.line(img, origin, tuple(points[1].ravel()), (0,255,0), 5)
+	img = cv2.line(img, origin, tuple(poitns[2].ravel()), (0,0,255), 5)
 
 def setup():
 	testImg = cv2.imread('HeadPoseTest/test1.jpg')
