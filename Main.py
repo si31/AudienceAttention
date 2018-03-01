@@ -1,4 +1,5 @@
 import sys
+import os
 import cv2
 import numpy as np
 import uuid
@@ -33,8 +34,10 @@ def readFromDatabase(imgName):
 
 
 def inDatabase(imgName):
-	fileNames = fileToArray('Database/filenames.txt')
-	return ((imgName + '.txt') in fileNames)
+	for file in os.listdir("Database/"):
+		if file == imgName + '.txt':
+			return True
+	return False
 
 
 def fileToArray(imgName):
@@ -68,6 +71,8 @@ def showAllPeople(persons):
 		cv2.imshow('image',	person.image)
 		person.accumulateData()
 		print(person.data)
+		print(person.landmarks)
+		print(person.image.shape)
 		key = cv2.waitKey(0)
 		if key == ord('q'):
 			break
@@ -81,12 +86,12 @@ def detectFeatures(img):
 	print('Detecting landmarks, head pose, occlusion, blur...')
 	for person in img.persons:
 		ComputerVision.faceLandmarks(person, mark=False)
-		HeadDirection.getPose(person, img.image.shape, mark=False)
-		person.blur = ComputerVision.blur(person.image)
+		HeadDirection.getPose(person, img.image.shape, mark=True)
+		#person.blur = ComputerVision.blur(person.image)
 	print('Detecting posture...')
 	PostureDetection.getPosture(img)
-	print('Detecting image blur...')
-	img.blur = ComputerVision.blur(img.image)
+	#print('Detecting image blur...')
+	#img.blur = ComputerVision.blur(img.image)
 
 
 def calculateAttention(persons):
@@ -103,7 +108,6 @@ def handleImage(imgName, imgFile=None):
 		imgFile = cv2.imread('imgsInDatabase/'+imgName)
 	
 	img = None
-
 	if inDatabase(imgName) and sys.argv[2] == '3':
 		img = readFromDatabase(imgName)
 	else:
@@ -157,14 +161,12 @@ def main():
 		return
 
 	fileName = sys.argv[1]
-	time1 = time.gmtime(0)
 	if fileName.endswith('.jpg') or fileName.endswith('.png'):
 		handleImage(fileName)
 	elif fileName.endswith('.mp4'):
 		handleVideo(fileName, 10)
 	else:
 		print('Input file is of wrong type. Please use .jpg or .png for images and .mp4 for videos.')
-	print(time.gmtime(0)-time1)
 
 if __name__ == "__main__":
 	main()

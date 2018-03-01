@@ -109,7 +109,7 @@ def associatePersons(personsA, personsB):
 def determineHandPositionType(face, leftHand, rightHand):
 	leftOcclusion = HelperFunctions.bbOverLapRatio(face, leftHand) > 0.01
 	rightOcclusion = HelperFunctions.bbOverLapRatio(face, rightHand) > 0.01
-	occlusion = leftOcclusion or rightOcclusion
+	occlusion = 1 if leftOcclusion or rightOcclusion else 0
 	return (occlusion)
 
 

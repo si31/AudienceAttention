@@ -14,7 +14,7 @@ class Person:
 		self.labels = []
 
 		#images
-		self.image = HelperFunctions.cropImage(img, self, 0)
+		self.image = HelperFunctions.cropImageRatio(img, self, 0.1)
 		self.imageExtra = HelperFunctions.cropImageRatio(img, self, 2)
 		self.skin = None
 		self.hogDrawing = None
@@ -24,8 +24,11 @@ class Person:
 		self.poseAngle = None
 		self.poseDistance = None
 		self.postureLR = None
-		self.occlusion = None
+		self.occlusion = -1
 		self.attention = None
+
+		#extra
+		self.poseArea = None
 
 		#not sure about these
 		self.leftLooking = None
@@ -33,8 +36,29 @@ class Person:
 		self.cropped = None
 
 
-	def accumulateData():
+	def accumulateData(self):
 		#probably need to be more selective and refined
+		if self.poseDistance < 100:
+			self.poseArea = 5
+		else:
+			if self.poseAngle < 22.5:
+				self.poseArea = 1
+			elif self.poseAngle < 67.5:
+				self.poseArea = 2
+			elif self.poseAngle < 67.5:
+				self.poseArea = 3
+			elif self.poseAngle < 67.5:
+				self.poseArea = 4
+			elif self.poseAngle < 67.5:
+				self.poseArea = 6
+			elif self.poseAngle < 67.5:
+				self.poseArea = 2
+			elif self.poseAngle < 67.5:
+				self.poseArea = 2
+			elif self.poseAngle < 67.5:
+				self.poseArea = 2
+			elif self.poseAngle < 67.5:
+				self.poseArea = 2
 		self.data = [self.blur, self.poseAngle, self.poseDistance, self.postureLR, self.occlusion, self.attention]
 
 
