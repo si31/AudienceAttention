@@ -83,12 +83,12 @@ def showAllPeople(persons):
 
 
 def detectFeatures(img):
-	print('Detecting landmarks, head pose, occlusion, blur...')
+	print('Detecting landmarks, head pose, blur...')
 	for person in img.persons:
 		ComputerVision.faceLandmarks(person, mark=False)
-		HeadDirection.getPose(person, img.image.shape, mark=True)
-		#person.blur = ComputerVision.blur(person.image)
-	print('Detecting posture...')
+		HeadDirection.getPose(person, img.image.shape, mark=False)
+		person.blur = ComputerVision.blur(person.image)
+	print('Detecting occlusion, posture...')
 	PostureDetection.getPosture(img)
 	#print('Detecting image blur...')
 	#img.blur = ComputerVision.blur(img.image)
@@ -121,6 +121,8 @@ def handleImage(imgName, imgFile=None):
 				FaceDetection.findFaces(img, mark=False)
 			detectFeatures(img)
 		calculateAttention(img.persons)
+		for person in img.persons:
+			person.accumulateData()
 
 	if sys.argv[3] == '1':
 		saveToDatabase(img, imgName)

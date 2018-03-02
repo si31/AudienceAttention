@@ -53,12 +53,17 @@ def runImage():
 	global img, phase
 	person = img.persons[index]
 
+	imgPIL0 = PILIm.fromarray(person.image)
+	imgTk0 = ImageTk.PhotoImage(imgPIL0)
+	imgView0 = tk.Label(image=imgTk0)
+	label0 = tk.Label(text=str(index))
+	label0.pack(side=tk.LEFT)
+	imgView0.pack(side=tk.LEFT)
+
 	imgPIL = PILIm.fromarray(person.imageExtra)
 	imgTk = ImageTk.PhotoImage(imgPIL)
 	imgView = tk.Label(image=imgTk)
-	label = tk.Label(text=str(index))
-	label.pack()
-	imgView.pack()
+	imgView.pack(side=tk.LEFT)
 
 	elementsToPack = []
 	
@@ -113,7 +118,7 @@ def runImage():
 		b0 = tk.Button(text="Right posture", command=lambda: nextImage(0))
 		elementsToPack = [b2, b1, b0]
 	for element in elementsToPack:
-		element.pack()
+		element.pack(side=tk.TOP)
 	root.mainloop()
 
 
@@ -130,7 +135,7 @@ def getLabelObject(person):
 
 
 def nextImage(val):
-
+	MAX_PHASE = 6
 	global img, phase, labelsForPerson, index, root
 	person = img.persons[index]
 
@@ -138,7 +143,7 @@ def nextImage(val):
 		labelsForPerson = getLabelObject(person)
 		labelsForPerson.humanFace = val
 		if val == 0:
-			phase = 1 
+			phase = MAX_PHASE
 	elif phase == 1:
 		labelsForPerson.humanAttention = val
 	elif phase == 2:
@@ -151,7 +156,7 @@ def nextImage(val):
 		labelsForPerson.humanOcclusion = val
 	elif phase == 6:
 		labelsForPerson.humanPostureLR = val
-	if phase == 1: # max phase number
+	if phase == MAX_PHASE:
 		index += 1
 		#labelsForPerson.data = [labelsForPerson.humanEyeAngle, labelsForPerson.humanMovement, labelsForPerson.humanOcclusion, labelsForPerson.humanPostureLR]
 		saveToDatabase(img, sys.argv[1])
@@ -163,7 +168,7 @@ def nextImage(val):
 	root.destroy()
 	root = tk.Tk()
 	root.title("Audience Attention Labeller")
-	root.geometry('500x500+700+300')
+	root.geometry('700x700+300+300')
 	runImage() 
 
 

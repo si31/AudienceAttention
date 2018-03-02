@@ -23,12 +23,13 @@ class Person:
 		self.blur = None
 		self.poseAngle = None
 		self.poseDistance = None
-		self.postureLR = None
+		self.postureLR = -1.0
 		self.occlusion = -1
 		self.attention = None
 
 		#extra
 		self.poseArea = None
+		self.postureArea = None
 
 		#not sure about these
 		self.leftLooking = None
@@ -38,27 +39,36 @@ class Person:
 
 	def accumulateData(self):
 		#probably need to be more selective and refined
-		if self.poseDistance < 100:
+		print(self.face)
+		faceWidth = self.face[2]
+		angle = self.poseAngle - 3.14/8
+		if angle < -3.14:
+			angle = angle + 6.28
+		if self.poseDistance < faceWidth*0.5:
 			self.poseArea = 5
 		else:
-			if self.poseAngle < 22.5:
-				self.poseArea = 1
-			elif self.poseAngle < 67.5:
-				self.poseArea = 2
-			elif self.poseAngle < 67.5:
-				self.poseArea = 3
-			elif self.poseAngle < 67.5:
+			if angle < -2.36:
 				self.poseArea = 4
-			elif self.poseAngle < 67.5:
+			elif angle < -1.57:
+				self.poseArea = 1
+			elif angle < -0.79:
+				self.poseArea = 2
+			elif angle < 0:
+				self.poseArea = 3
+			elif angle < 0.79:
 				self.poseArea = 6
-			elif self.poseAngle < 67.5:
-				self.poseArea = 2
-			elif self.poseAngle < 67.5:
-				self.poseArea = 2
-			elif self.poseAngle < 67.5:
-				self.poseArea = 2
-			elif self.poseAngle < 67.5:
-				self.poseArea = 2
+			elif angle < 1.57:
+				self.poseArea = 9
+			elif angle < 2.36:
+				self.poseArea = 8
+			else:
+				self.poseArea = 7
+		if self.postureLR < -15:
+			self.postureArea = 0
+		elif self.postureLR > 15:
+			self.postureArea = 2
+		else:
+			self.postureArea = 1
 		self.data = [self.blur, self.poseAngle, self.poseDistance, self.postureLR, self.occlusion, self.attention]
 
 
