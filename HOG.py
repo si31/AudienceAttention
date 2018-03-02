@@ -13,10 +13,10 @@ SZ = 20
 C=2.67
 GAMMA=5.383
 
-height = 128
-width = 128
+height = 32
+width = 32
 
-cellsize = 8
+cellsize = 4
 
 viewRatio = 3
 
@@ -60,6 +60,8 @@ def convertImage(img):
 		for val in normalisationRange:
 			length += math.pow(val,2)
 		length = math.sqrt(length)
+		if length == 0:
+			length = 1
 		for j in range(i*18, (i+1)*18):
 			hog[j] = hog[j] / length
 		normalisationRange = hog[i*18:(i+1)*18]
@@ -213,7 +215,7 @@ def draw_mag(img,hog):
 def getHOG(img):
 	img = cv2.resize(img, (width,height), interpolation=cv2.INTER_LINEAR);
 	hog = convertImage(img)
-	hogDrawing = np.zeros(img.shape)#cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)#np.zeros(img.shape)
+	hogDrawing = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)#np.zeros(img.shape)
 	hogDrawing = cv2.resize(hogDrawing, (width*viewRatio,height*viewRatio), interpolation=cv2.INTER_LINEAR);
 	draw_hog(hogDrawing, hog)
 	return hogDrawing
