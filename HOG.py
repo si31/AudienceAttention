@@ -13,12 +13,12 @@ SZ = 20
 C=2.67
 GAMMA=5.383
 
-height = 32
-width = 32
+height = 128
+width = 128
 
-cellsize = 4
+cellsize = 8
 
-viewRatio = 3
+viewRatio = 5
 
 affine_flags = cv2.WARP_INVERSE_MAP|cv2.INTER_LINEAR
 
@@ -51,7 +51,7 @@ def convertImage(img):
 				for y in range(0,cellsize):
 					histogramBins[int(angle[i*cellsize+x, j*cellsize+y] / 40)] += mag[i*cellsize+x, j*cellsize+y]
 			hog += (histogramBins)
-
+	"""
 	#normalisation
 	for i in range(0, width//(cellsize*2) + height//(cellsize*2)):
 		normalisationRange = hog[i*18:(i+1)*18] + hog[(i*18+(9*(width//cellsize))):i*18+(9*(width//cellsize))]
@@ -66,11 +66,11 @@ def convertImage(img):
 			hog[j] = hog[j] / length
 		normalisationRange = hog[i*18:(i+1)*18]
 		print(normalisationRange)
-
+	"""
 
 	return np.array(hog)
 
-"""
+
 def openCVHOG(img):
 		#resize
 		img = cv2.resize(img, (width,height), interpolation=cv2.INTER_LINEAR);
@@ -86,7 +86,7 @@ def openCVHOG(img):
 		#found, w = hog.detectMultiScale(img)
 		output = hog.compute(img)
 		return output
-"""
+
 
 
 def svmTrain(trainData, labels):
@@ -200,7 +200,7 @@ def draw_mag(img,hog):
 			px, py = int(x*inflatedCellsize + inflatedCellsize/2), int(y*inflatedCellsize + inflatedCellsize/2)
 			featNums = x*vertCells*9+y*9
 			feat = hog[featNums:featNums+9]			 
-			#maxv = np.max(feat)
+			maxv = np.max(feat)
 			fdraw = []
 			for i in range(0, 9):
 				angle = i*40+20+90
@@ -215,7 +215,7 @@ def draw_mag(img,hog):
 def getHOG(img):
 	img = cv2.resize(img, (width,height), interpolation=cv2.INTER_LINEAR);
 	hog = convertImage(img)
-	hogDrawing = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)#np.zeros(img.shape)
+	hogDrawing = np.zeros(img.shape)#cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)#np.zeros(img.shape)#
 	hogDrawing = cv2.resize(hogDrawing, (width*viewRatio,height*viewRatio), interpolation=cv2.INTER_LINEAR);
 	draw_hog(hogDrawing, hog)
 	return hogDrawing
