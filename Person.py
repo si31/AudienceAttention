@@ -44,7 +44,7 @@ class Person:
 		angle = self.poseAngle - 3.14/8
 		if angle < -3.14:
 			angle = angle + 6.28
-		if self.poseDistance <90:
+		if self.poseDistance < 85:
 			self.poseArea = 5
 		else:
 			if angle < -2.36:

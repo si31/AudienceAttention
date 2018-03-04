@@ -23,7 +23,7 @@ def compareLabels():
 			print(person.poseDistance)
 	for comparison in comparisons:
 		([a1,b1,c1,d1],[a2,b2,c2,d2]) = comparison
-		if a1 == a2 or (a1,a2) in listOfGoodComparisonsForHeadPose or (a2,a1) in listOfGoodComparisonsForHeadPose:
+		if (a1 == 5 and a2 == 5) or (a1 != 5 and a2 != 5):
 			poseAreaAccuracy += 1
 	print(poseAreaAccuracy / len(comparisons))
 

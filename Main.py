@@ -118,7 +118,7 @@ def handleImage(imgName, imgFile=None):
 				img = readFromDatabase(imgName)
 			else:
 				img = Image(imgFile)
-				FaceDetection.findFaces(img, mark=True)
+				FaceDetection.findFaces(img, mark=False)
 			detectFeatures(img)
 		calculateAttention(img.persons)
 		#ComputerVision.findMovement(img)

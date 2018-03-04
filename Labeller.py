@@ -55,6 +55,7 @@ def runImage():
 
 	person.accumulateData()
 	print(person.poseArea)
+	print(person.poseDistance)
 
 	imgPIL0 = PILIm.fromarray(person.image)
 	imgTk0 = ImageTk.PhotoImage(imgPIL0)
