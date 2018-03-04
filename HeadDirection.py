@@ -11,9 +11,9 @@ import math
 #standard relative points on a 3D head model
 #from learn opencv site
 MODEL_POINTS_3D = np.array([(0.0, 0.0, 0.0),             # Nose tip
-							(0.0, -330.0, -65.0),        # Chin
-							(-225.0, 170.0, -135.0),     # Left eye left corner
-							(225.0, 170.0, -135.0)      # Right eye right corner
+							(0.0, -300.0, -65.0),        # Chin #old 330
+							(-250.0, 140.0, -135.0),     # Left eye left corner #old 140
+							(250.0, 140.0, -135.0)      # Right eye right corner #old
 							#(-150.0, -150.0, -125.0),    # Left Mouth corner
 							#(150.0, -150.0, -125.0)      # Right mouth corner
 						 	])
@@ -73,11 +73,11 @@ def getPose(person, imgShape, mark=False):
 								[0,0,1]],
 								dtype = "double")
 
-	axis = np.float32([[0.0, 0.0, 1000.0]])
+	axis = np.float32([[0.0, 0.0, -1000.0], [1000.0, 0.0, 0.0], [0.0, 1000.0, 0.0]])
 	dist_coeffs = np.zeros((4,1)) #assumes no lens distortion
 	(success, rotation_vector, translation_vector) = cv2.solvePnP(MODEL_POINTS_3D, faceMarkers, camera_matrix, dist_coeffs, flags=cv2.SOLVEPNP_ITERATIVE)
 	(nose_end_point2D, jacobian) = cv2.projectPoints(axis, rotation_vector, translation_vector, camera_matrix, dist_coeffs)
-
+	person.poseParameters = [item for sublist in nose_end_point2D.tolist() for subsublist in sublist for item in subsublist]
 	p1 = (int(faceMarkers[0][0]), int(faceMarkers[0][1]))
 	p2 = (int(nose_end_point2D[0][0][0]), int(nose_end_point2D[0][0][1]))
 	p2relative = (p2[0]-p1[0], p2[1]-p1[1])

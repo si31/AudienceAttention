@@ -6,6 +6,7 @@ import HelperFunctions
 import dlib
 import pickle
 import math
+import MachineLearning
 
 
 def edgeDetection(img):
@@ -54,6 +55,25 @@ def varianceTwoImagesSingleChannel(img1, img2):
 	average = total / (img1.shape[0] + img1.shape[1])
 	sd = squaresAverage - math.pow(average,2)
 	return sd
+
+def findMovement(img):
+	print('Finding Movement...')
+	datapoints = []
+	for person in img.persons:
+		(x,y,w,h) = person.face
+		datapoints.append((y,person.blur))
+	x = [i[0] for i in datapoints]
+	y = [i[1] for i in datapoints]
+	linearRegressionModel = MachineLearning.createLinearRegressionModel(x,y,plot=False)
+	numRemoved = 0
+	for person in img.persons:
+		(x,y,w,h) = person.face
+		predictedBlur = MachineLearning.linearRegressionPredict(linearRegressionModel, y)
+		print('Predicted: ' + str(predictedBlur[0]))
+		print('Actual: ' + str(person.blur))
+		print('Ratio: ' + str(predictedBlur[0]/person.blur))
+		cv2.imshow('img', person.image)
+		cv2.waitKey(0)
 
 def blur(image):
 	lapacian = np.array([[0,1,0],[1,-4,1],[0,1,0]])
