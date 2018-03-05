@@ -138,23 +138,23 @@ def handleImage(imgName, imgFile=None):
 
 def handleVideo(vidName, frameInterval):
 	print('Reading video...')
-	cap = cv2.VideoCapture('imgsInDatabase/'+vidName)
 
+	cap = cv2.VideoCapture('imgsInDatabase/'+vidName)
 	video = Video()
 	i = 0
 
 	while(cap.isOpened()):
 		ret, frame = cap.read()
 		i += 1
-
 		if i % frameInterval != 0:
 			continue
-
-		video.frames.append(frame)
-		video.frameObjects.append(handleImage(vidName, frame))
+		video.frameImages.append(frame)
+		video.frames.append(handleImage(vidName, frame))
 
 	cap.release()
 	cv2.destroyAllWindows()
+
+	video.collatePersons()
 
 def main():
 	print('Usage: file name, use saved if available (3=used saved everything, 2=used saved redo attention, 1=used saved faces, 0=redo everything), save to database, view faces')	

@@ -4,10 +4,11 @@ import HelperFunctions
 class Video:
 
 	def __init__(self):
-		self.frames = []
+		self.frameImages = [] # actual images
+		self.frames = [] #image objects
 		self.persons = [] #array of videoPerson objects
 
-	def trackPersonAcrossFrames(self):
+	def collatePersons(self):
 		for person in frames[0].persons:
 			videoPerson = VideoPerson(person)
 			self.persons.append(videoPerson, 0)
@@ -43,8 +44,15 @@ class VideoPerson:
 		self.numberOfFramesIn += 1
 		self.averagePosition = self.newAveragePosition(personInFrame.face)
 
-	def newAveragePosition(self, newPosition):
+	def calcNewAveragePosition(self, newPosition):
 		(x1,y1,w1,h1) = self.averagePosition
 		(x2,y2,w2,h2) = self.face
 		self.averagePosition = ((x1+x2)//2,(y1+y2)//2,(w1+w2)//2,(h1+h2)//2)
+
+	def calcAverageAttention(self):
+		attentionSum = 0
+		for imagePerson in self.imagePersons:
+			if imagePerson is not None:
+				attentionSum += imagePerson.attention
+		self.averagePosition = attentionSum/self.numberOfFramesIn
 
