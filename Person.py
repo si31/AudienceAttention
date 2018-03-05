@@ -27,9 +27,10 @@ class Person:
 		self.postureLR = -1.0
 		self.occlusion = -1
 		self.attention = None
+		self.earDetected = False
 
 		#extra
-		self.poseArea = None
+		self.lookingForward = None
 		self.postureArea = None
 
 		#not sure about these
@@ -39,8 +40,8 @@ class Person:
 
 
 	def accumulateData(self):
-		#probably need to be more selective and refined
-		faceWidth = self.face[2]
+
+		"""  #for the exact angle
 		angle = self.poseAngle - 3.14/8
 		if angle < -3.14:
 			angle = angle + 6.28
@@ -63,13 +64,21 @@ class Person:
 				self.poseArea = 8
 			else:
 				self.poseArea = 7
+		"""
+
+		if self.poseDistance > 85 or self.earDetected:
+			self.lookingForward = 0
+		else:
+			self.lookingForward = 5
+
 		if self.postureLR < -15:
 			self.postureArea = 0
 		elif self.postureLR > 15:
 			self.postureArea = 2
 		else:
 			self.postureArea = 1
-		self.data = [self.blur, self.poseAngle, self.poseDistance, self.postureLR, self.occlusion, self.attention]
+			
+		self.data = [self.blur, self.lookingForward, self.postureLR, self.occlusion, self.attention]
 
 
 class LabelsForPerson:

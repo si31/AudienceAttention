@@ -90,6 +90,7 @@ def detectFeatures(img):
 		person.blur = ComputerVision.blur(person.image)
 	print('Detecting occlusion, posture...')
 	#PostureDetection.getPosture(img)
+	ComputerVision.findEars(img)
 	#print('Detecting image blur...')
 	#img.blur = ComputerVision.blur(img.image)
 
