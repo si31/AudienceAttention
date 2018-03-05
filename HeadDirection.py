@@ -92,6 +92,7 @@ def getPose(person, imgShape, mark=False):
 		for p in faceMarkers:
 			cv2.circle(person.image, (int(p[0]), int(p[1])), 3, (0,0,255), -1)
 
+
 def draw(img, origin, points):
 	origin = tuple([int(p) for p in origin])[0:2]
 	print(points)

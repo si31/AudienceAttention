@@ -40,11 +40,11 @@ def getCascades():
 						'/home/simon/opencv/data/haarcascades/haarcascade_profileface.xml',
 						'/home/simon/opencv/data/haarcascades/haarcascade_frontalface_alt_tree.xml']
 
-
 	cascades = []
 	for cascadePath in cascadePaths:
 		cascades.append(cv2.CascadeClassifier(cascadePath))
 	return cascades
+
 
 def splitImageVertically(img, n):
 	n += 1
@@ -58,6 +58,7 @@ def splitImageVertically(img, n):
 			upperVal = img.shape[1]
 		sections.append((img[lowerVal:upperVal, 0:img.shape[0]], lowerVal))
 	return sections[:-1]
+
 
 def removeUnlikelyFaces(detected, minFactor, maxFactor):
 	print('Removing unlikely faces...')
@@ -79,6 +80,7 @@ def removeUnlikelyFaces(detected, minFactor, maxFactor):
 		detected = removeUnlikelyFaces(detected, minFactor*1.1 if minFactor < 0.7 else minFactor, maxFactor*0.9 if maxFactor > 1.75 else maxFactor)
 
 	return detected
+
 
 def findFaces(img, mark=False):
 	print('Detecting faces...')

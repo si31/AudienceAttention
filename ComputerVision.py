@@ -43,6 +43,7 @@ def applyFilter(img, filterArray):
 			newImage[x][y] = total
 	return newImage
 
+
 def varianceTwoImagesSingleChannel(img1, img2):
 	totalSquares = 0
 	total = 0
@@ -55,6 +56,7 @@ def varianceTwoImagesSingleChannel(img1, img2):
 	sd = squaresAverage - math.pow(average,2)
 	return sd
 
+
 def blur(image):
 	lapacian = np.array([[0,1,0],[1,-4,1],[0,1,0]])
 	gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -62,11 +64,10 @@ def blur(image):
 	sd = varianceTwoImagesSingleChannel(gray, filtered)
 	return sd
 
+
 def faceLandmarks(person, mark=False):
 	predictor = dlib.shape_predictor('shape_predictor_68_face_landmarks.dat')
-	
 	rect = HelperFunctions.dlibBBToRect(0,0,person.face[2],person.face[3])
-
 	gray = cv2.cvtColor(person.image, cv2.COLOR_BGR2GRAY)
 
 	# determine the facial landmarks for the face region, then
@@ -86,7 +87,10 @@ def readFromDatabase(imgName):
 		person = pickle.load(f)
 	return person
 
+
 def main():
 	blur(readFromDatabase('ArmTest/arm1').image)
+
+
 if __name__ == "__main__":
 	main()
