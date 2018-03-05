@@ -102,6 +102,33 @@ def faceLandmarks(person, mark=False):
 			cv2.circle(person.image, (x, y), 1, (0, 0, 255), -1)
 
 
+def findEars(img, mark=False):
+	cascadePaths = []
+	detected = []
+
+	mac = True
+	if mac:
+		cascadePaths.append('/usr/local/Cellar/opencv/3.3.0_3/share/OpenCV/haarcascades/haarcascade_mcs_rightear.xml')
+		cascadePaths.append('/usr/local/Cellar/opencv/3.3.0_3/share/OpenCV/haarcascades/haarcascade_mcs_leftear.xml')
+	else:
+		cascadePaths.append('/home/simon/opencv/data/haarcascades/haarcascade_mcs_rightear.xml')
+		cascadePaths.append('/home/simon/opencv/data/haarcascades/haarcascade_mcs_leftear.xml')
+
+	for cascadePath in cascadePaths:
+		cascade = cv2.CascadeClassifier(cascadePath)
+		detected += cascade.detectMultiScale(img.image, 1.1, 1).tolist()
+	
+	if mark:
+		for item in detected:
+			(x,y,w,h) = item 
+			cv2.rectangle(img.image,(x,y),(x+w,y+h),(0,0,255),2)
+
+	for person in img.persons:
+		for ear in detected:
+			if HelperFunctions.bbOverLapRatio(person.face, ear) > 0.01:
+				person.earDetected = True
+
+
 def readFromDatabase(imgName):
 	print('Reading from database...')
 	with open(imgName + '.txt', 'rb') as f:
