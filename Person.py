@@ -21,6 +21,7 @@ class Person:
 	
 		#detected attributes
 		self.blur = None
+		self.poseParameters = []
 		self.poseAngle = None
 		self.poseDistance = None
 		self.postureLR = -1.0
@@ -39,12 +40,11 @@ class Person:
 
 	def accumulateData(self):
 		#probably need to be more selective and refined
-		print(self.face)
 		faceWidth = self.face[2]
 		angle = self.poseAngle - 3.14/8
 		if angle < -3.14:
 			angle = angle + 6.28
-		if self.poseDistance < faceWidth*0.5:
+		if self.poseDistance < 85:
 			self.poseArea = 5
 		else:
 			if angle < -2.36:

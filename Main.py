@@ -89,7 +89,7 @@ def detectFeatures(img):
 		HeadDirection.getPose(person, img.image.shape, mark=False)
 		person.blur = ComputerVision.blur(person.image)
 	print('Detecting occlusion, posture...')
-	PostureDetection.getPosture(img)
+	#PostureDetection.getPosture(img)
 	#print('Detecting image blur...')
 	#img.blur = ComputerVision.blur(img.image)
 
@@ -121,6 +121,7 @@ def handleImage(imgName, imgFile=None):
 				FaceDetection.findFaces(img, mark=False)
 			detectFeatures(img)
 		calculateAttention(img.persons)
+		#ComputerVision.findMovement(img)
 		for person in img.persons:
 			person.accumulateData()
 

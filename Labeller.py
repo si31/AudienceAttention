@@ -53,6 +53,10 @@ def runImage():
 	global img, phase
 	person = img.persons[index]
 
+	person.accumulateData()
+	print(person.poseArea)
+	print(person.poseDistance)
+
 	imgPIL0 = PILIm.fromarray(person.image)
 	imgTk0 = ImageTk.PhotoImage(imgPIL0)
 	imgView0 = tk.Label(image=imgTk0)
@@ -135,10 +139,9 @@ def getLabelObject(person):
 
 
 def nextImage(val):
-	MAX_PHASE = 6
+	MAX_PHASE = 2
 	global img, phase, labelsForPerson, index, root
 	person = img.persons[index]
-
 	if phase == 0:
 		labelsForPerson = getLabelObject(person)
 		labelsForPerson.humanFace = val
@@ -164,7 +167,7 @@ def nextImage(val):
 			exit()
 		phase = 0
 	else:
-		phase += 1
+		phase += 2
 	root.destroy()
 	root = tk.Tk()
 	root.title("Audience Attention Labeller")
