@@ -127,6 +127,7 @@ def findEars(img, mark=False):
 		for ear in detected:
 			if HelperFunctions.bbOverLapRatio(person.face, ear) > 0.01:
 				person.earDetected = True
+				break
 
 
 def readFromDatabase(imgName):
