@@ -5,8 +5,6 @@ import numpy as np
 import uuid
 import base64
 import pickle
-import HOG
-import time
 
 import FaceDetection
 import ComputerVision
