@@ -13,49 +13,12 @@ import ComputerVision
 import MachineLearning
 import HeadDirection
 import PostureDetection
+import HelperFunctions
 import HAAR
 
 from Person import Person
 from Image import Image
 from Video import Video
-
-
-def saveToDatabase(img, imgName):
-	print('Saving to database...')
-	with open('Database/' + imgName + '.txt', 'wb') as f:
-		pickle.dump(img, f)
-
-
-def readFromDatabase(imgName):
-	print('Reading from database...')
-	with open('Database/' + imgName + '.txt', 'rb') as f:
-		img = pickle.load(f)
-	return img
-
-
-def inDatabase(imgName):
-	for file in os.listdir("Database/"):
-		if file == imgName + '.txt':
-			return True
-	return False
-
-
-def fileToArray(imgName):
-	with open(imgName) as f:
-		content = f.readlines()
-		content = [x.strip() for x in content]
-	return content
-
-
-def saveImage(img):
-	print('Saving img to desktop...')
-	cv2.imwrite("/Users/admin/desktop/saved.jpg", img)
-
-
-def saveObject(obj):
-	print('Saving obj to desktop...')
-	with open("/Users/admin/desktop/saved.txt", 'wb') as f:
-		pickle.dump(obj, f)
 
 
 def showImage(img):
@@ -77,9 +40,9 @@ def showAllPeople(persons):
 		if key == ord('q'):
 			break
 		elif key == ord('s'):
-			saveObject(person)
+			HelperFunctions.saveObject(person)
 		elif key == ord('m'):
-			saveImage(person.image)
+			HelperFunctions.saveImage(person.image)
 
 
 def detectFeatures(img):
@@ -109,14 +72,14 @@ def handleImage(imgName, imgFile=None):
 		imgFile = cv2.imread('imgsInDatabase/'+imgName)
 	
 	img = None
-	if inDatabase(imgName) and sys.argv[2] == '3':
-		img = readFromDatabase(imgName)
+	if HelperFunctions.inDatabase(imgName) and sys.argv[2] == '3':
+		img = HelperFunctions.readFromDatabase(imgName)
 	else:
-		if inDatabase(imgName) and sys.argv[2] == '2':
-			img = readFromDatabase(imgName)
+		if HelperFunctions.inDatabase(imgName) and sys.argv[2] == '2':
+			img = HelperFunctions.readFromDatabase(imgName)
 		else:
-			if inDatabase(imgName) and sys.argv[2] == '1':
-				img = readFromDatabase(imgName)
+			if HelperFunctions.inDatabase(imgName) and sys.argv[2] == '1':
+				img = HelperFunctions.readFromDatabase(imgName)
 			else:
 				img = Image(imgFile)
 				FaceDetection.findFaces(img, mark=False)
@@ -127,7 +90,7 @@ def handleImage(imgName, imgFile=None):
 			person.accumulateData()
 
 	if sys.argv[3] == '1':
-		saveToDatabase(img, imgName)
+		HelperFunctions.saveToDatabase(img, imgName)
 
 	if sys.argv[4] == '1':
 		showImage(img.image)

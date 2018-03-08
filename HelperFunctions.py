@@ -2,6 +2,39 @@ import sys
 import cv2
 import numpy as np
 import dlib
+import pickle
+
+
+def saveImage(img):
+	print('Saving img to desktop...')
+	cv2.imwrite("/Users/admin/desktop/saved.jpg", img)
+
+
+def saveObject(obj):
+	print('Saving obj to desktop...')
+	with open("/Users/admin/desktop/saved.txt", 'wb') as f:
+		pickle.dump(obj, f)
+
+
+def saveToDatabase(img, imgName):
+	print('Saving to database...')
+	with open('Database/' + imgName + '.txt', 'wb') as f:
+		pickle.dump(img, f)
+
+
+def readFromDatabase(imgName):
+	print('Reading from database...')
+	with open('Database/' + imgName + '.txt', 'rb') as f:
+		img = pickle.load(f)
+	return img
+
+
+def inDatabase(imgName):
+	for file in os.listdir("Database/"):
+		if file == imgName + '.txt':
+			return True
+	return False
+
 
 #based on tutorial / post
 def bbOverLapRatio(bb1, bb2):
@@ -44,8 +77,8 @@ def cropImage(img, person, extra):
 	y = max(0, y-extra)
 	h = h+extra*2
 	w = w+extra*2
-
 	return img[y:y+h, x:x+w]
+
 
 def cropImageRatio(img, person, ratio):
 	(x,y,w,h) = person.face
@@ -74,7 +107,6 @@ def dlibRectToBB(rect):
 	y = rect.top()
 	w = rect.right() - x
 	h = rect.bottom() - y
- 
 	# return a tuple of (x, y, w, h)
 	return (x, y, w, h)
 
@@ -83,7 +115,6 @@ def dlibBBToRect(x,y,w,h):
 	# take a bounding predicted by dlib and convert it
 	# to the format (x, y, w, h) as we would normally do
 	# with OpenCV
-
 	return dlib.rectangle(x,y,x+w,y+h)
 
 
