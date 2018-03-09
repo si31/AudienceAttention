@@ -1,8 +1,9 @@
 import sys
 import os
 
-from Person import Person, LabelsForPerson 
+from Person import Person, LabelsForPerson, accumulateData, printData
 from Image import Image
+import HelperFunctions
 
 import tkinter as tk
 import pickle
@@ -35,27 +36,13 @@ def createGUI():
 	app.mainloop()
 
 
-def saveToDatabase(img, imgName):
-	print('Saving to database...')
-	with open('Database/' + imgName + '.txt', 'wb') as f:
-		pickle.dump(img, f)
-
-
-def readFromDatabase(imgName):
-	print('Reading from database...')
-	with open('Database/' + imgName + '.txt', 'rb') as f:
-		img = pickle.load(f)
-	return img
-
-
 def runImage():
 
 	global img, phase
 	person = img.persons[index]
 
-	person.accumulateData()
-	print(person.poseArea)
-	print(person.poseDistance)
+	accumulateData(person)
+	printData(person)
 
 	imgPIL0 = PILIm.fromarray(person.image)
 	imgTk0 = ImageTk.PhotoImage(imgPIL0)
@@ -162,7 +149,7 @@ def nextImage(val):
 	if phase == MAX_PHASE:
 		index += 1
 		#labelsForPerson.data = [labelsForPerson.humanEyeAngle, labelsForPerson.humanMovement, labelsForPerson.humanOcclusion, labelsForPerson.humanPostureLR]
-		saveToDatabase(img, sys.argv[1])
+		HelperFunctions.saveToDatabase(img, sys.argv[1])
 		if index > len(img.persons)-1:
 			exit()
 		phase = 0
@@ -185,7 +172,7 @@ def main():
 	
 	global img, labelIdentifier, root, index
 	print('Usage: imgName, command, label identifier, startFrom')
-	img = readFromDatabase(sys.argv[1])
+	img = HelperFunctions.readFromDatabase(sys.argv[1])
 	command = sys.argv[2]
 
 	print(len(img.persons))
@@ -204,7 +191,7 @@ def main():
 	elif command == "clear-make-sure":
 		for person in img.persons:
 			person.labels = []
-		saveToDatabase(img, sys.argv[1])
+		HelperFunctions.saveToDatabase(img, sys.argv[1])
 
 	elif command == "new":
 		labelIdentifier = sys.argv[3]
@@ -219,7 +206,7 @@ def main():
 			for label in person.labels:
 				if label.labelIdentifier == labelIdentifier:
 					person.labels.remove(label)
-		saveToDatabase(img, sys.argv[1])
+		HelperFunctions.saveToDatabase(img, sys.argv[1])
 
 	print('End')
 	return

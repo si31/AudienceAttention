@@ -1,35 +1,37 @@
 import sys
 import cv2
 import numpy as np
-from Person import Person
+from Person import Person, accumulateData, printData
 from Image import Image
-import Main
+import HelperFunctions
 
 listOfGoodComparisonsForHeadPose = [(4,1), (1,2), (2,3), (3,6), (6,9), (9,8), (8,7), (7,4)]
 C=2.67
 GAMMA=5.383
 
 def compareLabels():
-	img = Main.readFromDatabase(sys.argv[1])
+	img = HelperFunctions.readFromDatabase(sys.argv[1])
 	comparisons = []
 	poseAreaAccuracy = 0
+	baseAccuracy = 0
 	for person in img.persons:
 		if person.labels[0].humanFace:
-			person.accumulateData()
+			accumulateData(person)
 			label = person.labels[0]
-			thisComparison = ([person.poseArea, person.occlusion, person.postureArea, person.blur], [label.humanPoseAngle, label.humanOcclusion, label.humanPostureLR, label.humanMovement])
+			thisComparison = ([person.lookingForward, person.occlusion, person.postureArea, person.blur, person.earDetected], [label.humanPoseAngle, label.humanOcclusion, label.humanPostureLR, label.humanMovement])
 			comparisons.append(thisComparison)
-			print(thisComparison)
-			print(person.poseDistance)
 	for comparison in comparisons:
-		([a1,b1,c1,d1],[a2,b2,c2,d2]) = comparison
-		if (a1 == 5 and a2 == 5) or (a1 != 5 and a2 != 5):
+		([a1,b1,c1,d1,e1],[a2,b2,c2,d2]) = comparison
+		if (a1 == 1 and a2 == 5) or (a1 == 0 and a2 != 5):
 			poseAreaAccuracy += 1
+		if a2 == 5:
+			baseAccuracy += 1
 	print(poseAreaAccuracy / len(comparisons))
+	print(baseAccuracy / len(comparisons))
 
 
 def SVMHeadPose():
-	img = Main.readFromDatabase(sys.argv[1])
+	img = HelperFunctions.readFromDatabase(sys.argv[1])
 	trainData = []
 	labels = []
 	for person in img.persons:

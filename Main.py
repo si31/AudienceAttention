@@ -14,7 +14,7 @@ import PostureDetection
 import HelperFunctions
 import HAAR
 
-from Person import Person
+from Person import Person, accumulateData, printData
 from Image import Image
 from Video import Video
 
@@ -30,10 +30,8 @@ def showAllPeople(persons):
 	print('Showing all people...')
 	for person in persons:
 		cv2.imshow('image',	person.image)
-		person.accumulateData()
-		print(person.data)
-		print(person.landmarks)
-		print(person.image.shape)
+		accumulateData(person)
+		printData(person)
 		key = cv2.waitKey(0)
 		if key == ord('q'):
 			break
@@ -51,7 +49,7 @@ def detectFeatures(img):
 		person.blur = ComputerVision.blur(person.image)
 	print('Detecting occlusion, posture...')
 	#PostureDetection.getPosture(img)
-	ComputerVision.findEars(img)
+	ComputerVision.findEars(img, mark=False)
 	#print('Detecting image blur...')
 	#img.blur = ComputerVision.blur(img.image)
 
@@ -85,7 +83,7 @@ def handleImage(imgName, imgFile=None):
 		calculateAttention(img.persons)
 		#ComputerVision.findMovement(img)
 		for person in img.persons:
-			person.accumulateData()
+			accumulateData(person)
 
 	if sys.argv[3] == '1':
 		HelperFunctions.saveToDatabase(img, imgName)

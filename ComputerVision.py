@@ -97,7 +97,6 @@ def faceLandmarks(person, mark=False):
 	landmarks = HelperFunctions.shape_to_np(landmarks)
 	person.landmarks = landmarks.tolist()
 	if mark:
-		# loop over the (x, y)-coordinates for the facial landmarks and draw them on the image
 		for (x, y) in landmarks:
 			cv2.circle(person.image, (x, y), 1, (0, 0, 255), -1)
 
@@ -106,7 +105,7 @@ def findEars(img, mark=False):
 	cascadePaths = []
 	detected = []
 
-	mac = True
+	mac = False
 	if mac:
 		cascadePaths.append('/usr/local/Cellar/opencv/3.3.0_3/share/OpenCV/haarcascades/haarcascade_mcs_rightear.xml')
 		cascadePaths.append('/usr/local/Cellar/opencv/3.3.0_3/share/OpenCV/haarcascades/haarcascade_mcs_leftear.xml')
@@ -116,7 +115,7 @@ def findEars(img, mark=False):
 
 	for cascadePath in cascadePaths:
 		cascade = cv2.CascadeClassifier(cascadePath)
-		detected += cascade.detectMultiScale(img.image, 1.1, 1).tolist()
+		detected += cascade.detectMultiScale(img.image, 1.05, 1).tolist()
 	
 	if mark:
 		for item in detected:
@@ -125,7 +124,7 @@ def findEars(img, mark=False):
 
 	for person in img.persons:
 		for ear in detected:
-			if HelperFunctions.bbOverLapRatio(person.face, ear) > 0.01:
+			if HelperFunctions.bbOverLapRatio(person.face, ear) != 0:
 				person.earDetected = True
 				break
 

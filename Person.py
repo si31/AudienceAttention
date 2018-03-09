@@ -39,46 +39,56 @@ class Person:
 		self.cropped = None
 
 
-	def accumulateData(self):
+def printData(person):
+	print('-----')
+	print('Blur: ' + str(person.blur))
+	print('Looking forward: ' + str(person.lookingForward))
+	print('Posture LR: ' + str(person.postureLR))
+	print('Occlusion: ' + str(person.occlusion))
+	print('Ear detected: ' + str(person.earDetected))
+	print('Attention: ' + str(person.attention))
 
-		"""  #for the exact angle
-		angle = self.poseAngle - 3.14/8
-		if angle < -3.14:
-			angle = angle + 6.28
-		if self.poseDistance < 85:
-			self.poseArea = 5
-		else:
-			if angle < -2.36:
-				self.poseArea = 4
-			elif angle < -1.57:
-				self.poseArea = 1
-			elif angle < -0.79:
-				self.poseArea = 2
-			elif angle < 0:
-				self.poseArea = 3
-			elif angle < 0.79:
-				self.poseArea = 6
-			elif angle < 1.57:
-				self.poseArea = 9
-			elif angle < 2.36:
-				self.poseArea = 8
-			else:
-				self.poseArea = 7
-		"""
 
-		if self.poseDistance > 85 or self.earDetected:
-			self.lookingForward = 0
-		else:
-			self.lookingForward = 5
+def accumulateData(person):
 
-		if self.postureLR < -15:
-			self.postureArea = 0
-		elif self.postureLR > 15:
-			self.postureArea = 2
+	"""  #for the exact angle
+	angle = self.poseAngle - 3.14/8
+	if angle < -3.14:
+		angle = angle + 6.28
+	if self.poseDistance < 85:
+		self.poseArea = 5
+	else:
+		if angle < -2.36:
+			self.poseArea = 4
+		elif angle < -1.57:
+			self.poseArea = 1
+		elif angle < -0.79:
+			self.poseArea = 2
+		elif angle < 0:
+			self.poseArea = 3
+		elif angle < 0.79:
+			self.poseArea = 6
+		elif angle < 1.57:
+			self.poseArea = 9
+		elif angle < 2.36:
+			self.poseArea = 8
 		else:
-			self.postureArea = 1
-			
-		self.data = [self.blur, self.lookingForward, self.postureLR, self.occlusion, self.attention]
+			self.poseArea = 7
+	"""
+
+	if person.poseDistance > 85 or person.earDetected:
+		person.lookingForward = 0
+	else:
+		person.lookingForward = 1
+
+	if person.postureLR < -15:
+		person.postureArea = 0
+	elif person.postureLR > 15:
+		person.postureArea = 2
+	else:
+		person.postureArea = 1
+		
+	person.data = [person.blur, person.lookingForward, person.postureLR, person.occlusion, person.attention]
 
 
 class LabelsForPerson:

@@ -1,4 +1,5 @@
 import sys
+import os
 import cv2
 import numpy as np
 import dlib
@@ -18,6 +19,9 @@ def saveObject(obj):
 
 def saveToDatabase(img, imgName):
 	print('Saving to database...')
+	if img is None:
+		print('Trying to save None object. Save failed.')
+		return
 	with open('Database/' + imgName + '.txt', 'wb') as f:
 		pickle.dump(img, f)
 
