@@ -144,11 +144,14 @@ def calcDistance(point1, point2):
 
 FONT = cv2.FONT_HERSHEY_SIMPLEX
 
-def valueNextToBB(img, bb, value):
+def annotateImage(img, bb, val1, val2):
 	(x,y,w,h) = bb
 	boxX = x + w + 10
 	boxY = y
 	boxW = 40
 	boxH = 40
-	cv2.rectangle(img.image, (boxX, boxY), (boxX+boxW, boxY+boxH), (50,50,50), -1)
-	cv2.putText(img.image, str(value), (boxX, boxY), FONT, 4, (255,255,255), 2, CV2.LINE_AA)
+	cv2.rectangle(img.image, (x,y), (x+w, y+h), (0,255,0), 3)
+	cv2.rectangle(img.image, (boxX, boxY), (boxX+boxW, boxY+boxH), (255,255,255), -1)
+	cv2.putText(img.image, str(val1), (boxX, boxY+boxH-10), FONT, 1, (0,0,0), 2, cv2.LINE_AA)
+	cv2.rectangle(img.image, (boxX, boxY+boxH+10), (boxX+boxW, boxY+2*boxH+10), (255,255,255), -1)
+	cv2.putText(img.image, str(val2), (boxX, boxY+2*boxH), FONT, 1, (0,0,0), 2, cv2.LINE_AA)

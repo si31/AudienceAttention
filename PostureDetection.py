@@ -38,7 +38,7 @@ def runOP(img):
 		keypoints = PersonOPPoints(faces[index], hands[index], person)
 		personOPPointss.append(keypoints)
 	
-	view = True;
+	view = False;
 	if view:
 		#just for visual markers of each face
 		for person in personOPPointss:
@@ -99,7 +99,6 @@ class PersonOPPoints:
 	def calcHeadPose(self):
 		maxDistance = self.face[2]/5
 		OPHead = (HelperFunctions.calcDistance(self.leftEye[0:2], self.leftSideOfHead[0:2]) < maxDistance and HelperFunctions.calcDistance(self.rightEye[0:2], self.rightSideOfHead[0:2]) < maxDistance)
-		print(OPHead)
 		return OPHead
 
 

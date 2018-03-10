@@ -17,7 +17,8 @@ import HAAR
 from Person import Person, accumulateData, printData
 from Image import Image
 from Video import Video
-
+import tkinter as tk
+from PIL import ImageTk, Image as PILIm
 
 def showImage(img):
 	print('Showing image...')
@@ -58,10 +59,9 @@ def calculateAttention(img):
 	#need to load model and then use it to predict attention for each person
 	#need to pass image to the accumulate data function to allow it to get its blur for each section	
 	if True:# if model does not exist
-		for person in img.persons:
-			HelperFunctions.valueNextToBB(img, person.face, 42)
-	print('Attention not estimated as model does not exist.')
-	print('Estimating attention...')
+		print('Attention not estimated as model does not exist.')
+	else:
+		print('Estimating attention...')
 
 def handleImage(imgName, imgFile=None):
 
@@ -90,12 +90,55 @@ def handleImage(imgName, imgFile=None):
 	if sys.argv[3] == '1':
 		HelperFunctions.saveToDatabase(img, imgName)
 
+	for index, person in enumerate(img.persons): #annotation always happens after saving so the image is not affected
+		HelperFunctions.annotateImage(img, person.face, 42, index)
+
 	if sys.argv[4] == '1':
-		showImage(img.image)
-		showAllPeople(img.persons)
+		global imgGLO
+		imgGLO = img
+		displayInterface()
+		#showImage(img.image)
+		#showAllPeople(img.persons)
 
 	print('End')
 	return img
+
+
+imgGLO = None
+USER_INPUT = None
+root = None
+
+
+def displayInterface():
+	global USER_INPUT, imgGLO, root
+	root = tk.Tk()
+	USER_INPUT = tk.StringVar(root)
+	root.title("Audience Attention Analyser")
+	root.geometry("{0}x{1}+0+0".format(root.winfo_screenwidth(), root.winfo_screenheight()))
+	root.focus_set()
+	tk.Label(root, text="Overall Attention = ").pack()
+	tk.Label(root, text="View person: ").pack()
+	tk.Entry(root, textvariable=USER_INPUT).pack()
+	tk.Button(root, text="Go", command=viewPerson).pack()
+	tk.Button(root, text="Quit", command=root.destroy).pack()
+	ratio = (root.winfo_screenwidth() * 0.6)/imgGLO.image.shape[1]
+	width = int(ratio * imgGLO.image.shape[1])
+	height = int(ratio * imgGLO.image.shape[0])
+	imgToShow = cv2.resize(imgGLO.image, (width,height), interpolation=cv2.INTER_LINEAR);
+	imgToShow = cv2.cvtColor(imgToShow, cv2.COLOR_BGR2RGB)
+	imgPIL = PILIm.fromarray(imgToShow)
+	imgTk = ImageTk.PhotoImage(imgPIL)
+	imgView = tk.Label(image=imgTk).pack(side=tk.BOTTOM)
+	root.mainloop()
+
+
+def viewPerson():
+	global USER_INPUT, imgGLO
+	index = int(USER_INPUT.get())
+	person = imgGLO.persons[index]
+	printData(person)
+
+
 
 def handleVideo(vidName, frameInterval):
 	print('Reading video...')
