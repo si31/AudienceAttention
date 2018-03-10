@@ -26,9 +26,10 @@ def runOP(img):
 	op.detectFace(img)
 	op.detectHands(img)
 	res = np.copy(img)
-	#res = op.render(img) #get OP to render the body positions onto the image
+	res = op.render(img) #get OP to render the body positions onto the image
 	dataOP = op.getKeypoints(op.KeypointType.POSE)[0]
 	dataOP = dataOP.tolist()
+	dataOPFace = op.getKeypoints(op.KeypointType.POSE)[0].tolist()[0]
 
 	faces = op.faceRects.tolist()
 	hands = op.handRects.tolist()
@@ -37,7 +38,7 @@ def runOP(img):
 		keypoints = PersonOPPoints(faces[index], hands[index], person)
 		personOPPointss.append(keypoints)
 	
-	view = False;
+	view = True;
 	if view:
 		#just for visual markers of each face
 		for person in personOPPointss:
@@ -95,6 +96,12 @@ class PersonOPPoints:
 		y2 = (h1-h2)/2 + y1
 		return (int(x2),int(y2),int(w2),int(h2))
 
+	def calcHeadPose(self):
+		maxDistance = self.face[2]/5
+		OPHead = (HelperFunctions.calcDistance(self.leftEye[0:2], self.leftSideOfHead[0:2]) < maxDistance and HelperFunctions.calcDistance(self.rightEye[0:2], self.rightSideOfHead[0:2]) < maxDistance)
+		print(OPHead)
+		return OPHead
+
 
 def associatePersons(personsA, personsB):
 	associations = []
@@ -121,6 +128,7 @@ def getPosture(img):
 		(occlusion) = determineHandPositionType(personB.face, personB.leftHandBB, personB.rightHandBB)
 		personA.occlusion = occlusion
 		personA.postureLR = shoulderAngle(personB.leftShoulder, personB.rightShoulder)
+		personA.lookingForward = personB.calcHeadPose()
 
 
 if __name__ == '__main__':

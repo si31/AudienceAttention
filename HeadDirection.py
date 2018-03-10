@@ -17,6 +17,8 @@ MODEL_POINTS_3D = np.array([(0.0, 0.0, 0.0),             # Nose tip
 							#(-150.0, -150.0, -125.0),    # Left Mouth corner
 							#(150.0, -150.0, -125.0)      # Right mouth corner
 						 	])
+OPEN_POSE_MODEL_POINTS_3D = np.array([
+							])
 
 #my calcs from wiki page
 """
@@ -43,11 +45,19 @@ MODEL_POINTS_3D = np.array([(0.0, 0.0, 0.0),            # Sellion
 """
 							
 #followed tutorial
-def getPose(person, imgShape, mark=False):
+def getPose(person, imgShape, openPose=False, mark=False):
 	image = person.image
 	size = imgShape
 	 #from learn opencv site
-	faceMarkers = np.array([tuple(person.landmarks[30]), 
+	faceMarkers = None
+	global MODEL_POINTS_3D, OPEN_POSE_MODEL_POINTS_3D
+	if openPose:
+		MODEL_POINTS_3D = OPEN_POSE_MODEL_POINTS_3D
+		faceMarkers = np.array([],
+								dtype="double")
+
+	else:
+		faceMarkers = np.array([tuple(person.landmarks[30]), 
 							tuple(person.landmarks[8]), 
 							tuple(person.landmarks[36]),
 							tuple(person.landmarks[45])], 

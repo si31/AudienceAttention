@@ -48,17 +48,19 @@ def detectFeatures(img):
 		HeadDirection.getPose(person, img.image.shape, mark=False)
 		person.blur = ComputerVision.blur(person.image)
 	print('Detecting occlusion, posture...')
-	#PostureDetection.getPosture(img)
+	PostureDetection.getPosture(img)
 	ComputerVision.findEars(img, mark=False)
 	#print('Detecting image blur...')
 	#img.blur = ComputerVision.blur(img.image)
 
 
-def calculateAttention(persons):
+def calculateAttention(img):
 	#need to load model and then use it to predict attention for each person
 	#need to pass image to the accumulate data function to allow it to get its blur for each section	
 	if True:# if model does not exist
-		print('Attention not estimated as model does not exist.')
+		for person in img.persons:
+			HelperFunctions.valueNextToBB(img, person.face, 42)
+	print('Attention not estimated as model does not exist.')
 	print('Estimating attention...')
 
 def handleImage(imgName, imgFile=None):
@@ -80,7 +82,7 @@ def handleImage(imgName, imgFile=None):
 				img = Image(imgFile)
 				FaceDetection.findFaces(img, mark=False)
 			detectFeatures(img)
-		calculateAttention(img.persons)
+		calculateAttention(img)
 		#ComputerVision.findMovement(img)
 		for person in img.persons:
 			accumulateData(person)

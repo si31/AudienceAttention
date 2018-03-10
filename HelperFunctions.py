@@ -4,6 +4,7 @@ import cv2
 import numpy as np
 import dlib
 import pickle
+import math
 
 
 def saveImage(img):
@@ -133,4 +134,21 @@ def shape_to_np(shape, dtype="int"):
  
 	# return the list of (x, y)-coordinates
 	return coords
-	
+
+
+def calcDistance(point1, point2):
+	(x1,y1) = point1
+	(x2,y2) = point2
+	return math.sqrt(math.pow(x2-x2,2)+math.pow(y2-y1,2))
+
+
+FONT = cv2.FONT_HERSHEY_SIMPLEX
+
+def valueNextToBB(img, bb, value):
+	(x,y,w,h) = bb
+	boxX = x + w + 10
+	boxY = y
+	boxW = 40
+	boxH = 40
+	cv2.rectangle(img.image, (boxX, boxY), (boxX+boxW, boxY+boxH), (50,50,50), -1)
+	cv2.putText(img.image, str(value), (boxX, boxY), FONT, 4, (255,255,255), 2, CV2.LINE_AA)
