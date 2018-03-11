@@ -90,7 +90,6 @@ def faceLandmarks(person, mark=False):
 	predictor = dlib.shape_predictor('shape_predictor_68_face_landmarks.dat')
 	rect = HelperFunctions.dlibBBToRect(0,0,person.face[2],person.face[3])
 	gray = cv2.cvtColor(person.image, cv2.COLOR_BGR2GRAY)
-
 	# determine the facial landmarks for the face region, then
 	# convert the facial landmark (x, y)-coordinates to a NumPy array
 	landmarks = predictor(gray, rect)
@@ -115,7 +114,11 @@ def findEars(img, mark=False):
 
 	for cascadePath in cascadePaths:
 		cascade = cv2.CascadeClassifier(cascadePath)
-		detected += cascade.detectMultiScale(img.image, 1.05, 1).tolist()
+		result = cascade.detectMultiScale(img.image, 1.05, 1)
+		print(result)
+		if result == ():
+			continue
+		detected += result.tolist()
 	
 	if mark:
 		for item in detected:

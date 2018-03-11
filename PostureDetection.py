@@ -9,9 +9,12 @@ import numpy as np
 import math
 
 from Image import Image
+from Person import Person
 import HelperFunctions
+import ComputerVision
 
 OPENPOSE_ROOT = "/home/simon/openpose"
+
 
 def runOP(img):
 
@@ -97,18 +100,41 @@ class PersonOPPoints:
 		return (int(x2),int(y2),int(w2),int(h2))
 
 	def calcHeadPose(self):
-		maxDistance = self.face[2]/5
-		OPHead = (HelperFunctions.calcDistance(self.leftEye[0:2], self.leftSideOfHead[0:2]) < maxDistance and HelperFunctions.calcDistance(self.rightEye[0:2], self.rightSideOfHead[0:2]) < maxDistance)
-		return OPHead
+		maxDistance = self.face[2]/4
+		xOfBody = self.centreBody[0]
+		xOfFace = self.centreFace[0]
+		if math.fabs(xOfFace-xOfBody) > maxDistance:
+			print('no')
+			return 0
+		elif False:
+			#check the other thing
+			pass
+		else:
+			print('yes')
+			return 1
+		#OPHead = (HelperFunctions.calcDistance(self.leftEye[0:2], self.leftSideOfHead[0:2]) < maxDistance and HelperFunctions.calcDistance(self.rightEye[0:2], self.rightSideOfHead[0:2]) < maxDistance)
 
 
 def associatePersons(personsA, personsB):
+	global imgGLO
 	associations = []
-	for personA in personsA:
-		for personB in personsB:
-			if HelperFunctions.bbOverLapRatio(personA.face, personB.face) > 0.01:
-				associations.append((personA, personB))
-				break
+	for personB in personsB:
+		if personB.face != [0,0,0,0]:
+			found = False
+			for personA in personsA:
+				if HelperFunctions.bbOverLapRatio(personA.face, personB.face) > 0.01:
+					associations.append((personA, personB))
+					personA.face = personB.face
+					found = True
+					break
+			if not found:
+				newPerson = Person(imgGLO.image, personB.face, None)
+				ComputerVision.faceLandmarks(newPerson, mark=False)
+				#HeadDirection.getPose(newPerson, imgGLO.image.shape, mark=False) # can get rid of as will overwrite it
+				newPerson.blur = ComputerVision.blur(newPerson.image)
+				imgGLO.persons.append(newPerson)
+				newPerson.poseDistance = 1000
+				associations.append((newPerson, personB))
 	return associations
 
 
@@ -119,7 +145,14 @@ def determineHandPositionType(face, leftHand, rightHand):
 	return (occlusion)
 
 
+imgGLO = None
+
+
 def getPosture(img):
+	print('start posture')
+	global imgGLO
+	imgGLO = img
+	print(imgGLO.image)
 	detectedPersons = img.persons #what has been detected by program so far
 	detectedPersonsOP = runOP(img.image)
 	associations = associatePersons(detectedPersons, detectedPersonsOP)
