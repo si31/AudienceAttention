@@ -22,8 +22,6 @@ class Person:
 		#detected attributes
 		self.blur = None
 		self.poseParameters = []
-		self.poseAngle = None
-		self.poseDistance = None
 		self.postureLR = -1.0
 		self.occlusion = -1
 		self.attention = None
@@ -32,6 +30,9 @@ class Person:
 		#extra
 		self.lookingForward = None
 		self.postureArea = None
+		self.poseAngle = None
+		self.poseDistance = None
+		self.headPoseOP = None
 
 		#not sure about these
 		self.leftLooking = None
@@ -75,11 +76,11 @@ def accumulateData(person):
 		else:
 			self.poseArea = 7
 	"""
-
-	if person.poseDistance > 85 or person.earDetected:
-		person.lookingForward = 0
-	else:
-		person.lookingForward = 1
+	if person.headPoseOP is None:
+		if person.poseDistance > 85 or person.earDetected:
+			person.lookingForward = 0
+		else:
+			person.lookingForward = 1
 
 	if person.postureLR < -15:
 		person.postureArea = 0

@@ -48,11 +48,12 @@ def detectFeatures(img):
 		ComputerVision.faceLandmarks(person, mark=False)
 		HeadDirection.getPose(person, img.image.shape, mark=False)
 		person.blur = ComputerVision.blur(person.image)
+		pass
 	print('Detecting occlusion, posture...')
-	PostureDetection.getPosture(img)
 	ComputerVision.findEars(img, mark=False)
-	#print('Detecting image blur...')
-	#img.blur = ComputerVision.blur(img.image)
+	PostureDetection.getPosture(img)
+	ComputerVision.finalMerge(img)
+	#ComputerVision.findMovement(img)
 
 
 def calculateAttention(img):

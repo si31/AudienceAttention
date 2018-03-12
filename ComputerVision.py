@@ -60,22 +60,16 @@ def varianceTwoImagesSingleChannel(img1, img2):
 
 def findMovement(img):
 	print('Finding Movement...')
-	datapoints = []
+	average = 0
 	for person in img.persons:
-		(x,y,w,h) = person.face
-		datapoints.append((y,person.blur))
-	x = [i[0] for i in datapoints]
-	y = [i[1] for i in datapoints]
-	linearRegressionModel = MachineLearning.createLinearRegressionModel(x,y,plot=False)
-	numRemoved = 0
+		average += person.blur
+	average = average / len(img.persons)
+	average *= 3
 	for person in img.persons:
-		(x,y,w,h) = person.face
-		predictedBlur = MachineLearning.linearRegressionPredict(linearRegressionModel, y)
-		print('Predicted: ' + str(predictedBlur[0]))
-		print('Actual: ' + str(person.blur))
-		print('Ratio: ' + str(predictedBlur[0]/person.blur))
-		cv2.imshow('img', person.image)
-		cv2.waitKey(0)
+		if person.blur > average:
+			print('hi')
+			cv2.imshow('img', person.image)
+			cv2.waitKey(0)
 
 
 def blur(image):
@@ -115,7 +109,6 @@ def findEars(img, mark=False):
 	for cascadePath in cascadePaths:
 		cascade = cv2.CascadeClassifier(cascadePath)
 		result = cascade.detectMultiScale(img.image, 1.05, 1)
-		print(result)
 		if result == ():
 			continue
 		detected += result.tolist()
@@ -130,6 +123,21 @@ def findEars(img, mark=False):
 			if HelperFunctions.bbOverLapRatio(person.face, ear) != 0:
 				person.earDetected = True
 				break
+
+
+def finalMerge(img):
+	newPersons = []
+	for personA in img.persons:
+		found = False
+		for personB in newPersons:
+			if HelperFunctions.bbOverLapRatio(personA.face, personB.face) > 0.5:
+				personB.face = [(x+y)//2 for x,y in list(zip(personA.face, personB.face))]
+				print(personB.face)
+				found = True
+				break
+		if not found:
+			newPersons.append(personA)
+	img.persons = newPersons
 
 
 def readFromDatabase(imgName):

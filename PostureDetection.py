@@ -29,7 +29,6 @@ def runOP(img):
 	op.detectFace(img)
 	op.detectHands(img)
 	res = np.copy(img)
-	res = op.render(img) #get OP to render the body positions onto the image
 	dataOP = op.getKeypoints(op.KeypointType.POSE)[0]
 	dataOP = dataOP.tolist()
 	dataOPFace = op.getKeypoints(op.KeypointType.POSE)[0].tolist()[0]
@@ -43,10 +42,7 @@ def runOP(img):
 	
 	view = False;
 	if view:
-		#just for visual markers of each face
-		for person in personOPPointss:
-			(x,y,w,h) = person.rightHandBB
-			cv2.rectangle(res,(x,y),(x+w,y+h),(0,0,255),4)
+		res = op.render(img) #get OP to render the body positions onto the image
 		res = cv2.resize(res, (640,480))
 		cv2.imshow("OpenPose result", res)			
 		key = cv2.waitKey(0)
@@ -103,12 +99,24 @@ class PersonOPPoints:
 		maxDistance = self.face[2]/4
 		xOfBody = self.centreBody[0]
 		xOfFace = self.centreFace[0]
-		if math.fabs(xOfFace-xOfBody) > maxDistance:
+		print('next')
+		side = (math.fabs(xOfFace-xOfBody) > maxDistance)
+		if xOfFace == 0 or xOfBody == 0:
+			side = False
+		leftLower = (self.leftSideOfHead[1] - self.leftEye[1] < maxDistance/2)
+		if self.leftSideOfHead[1] == 0 or self.leftEye[1] == 0:
+			leftLower = False
+		rightLower = (self.rightSideOfHead[1] - self.rightEye[1] < maxDistance/2)
+		if self.rightSideOfHead[1] == 0 or self.leftEye[1] == 0:
+			rightLower = False
+		print(side)
+
+		faceToBody = HelperFunctions.calcDistance(self.centreFace[0:2], self.centreBody[0:2])
+		print(faceToBody)
+		print(maxDistance*2)
+		if side or faceToBody < maxDistance*1.75:#leftLower or rightLower:
 			print('no')
 			return 0
-		elif False:
-			#check the other thing
-			pass
 		else:
 			print('yes')
 			return 1
@@ -122,7 +130,7 @@ def associatePersons(personsA, personsB):
 		if personB.face != [0,0,0,0]:
 			found = False
 			for personA in personsA:
-				if HelperFunctions.bbOverLapRatio(personA.face, personB.face) > 0.01:
+				if HelperFunctions.bbOverLapRatio(personA.face, personB.face) > 0.1:
 					associations.append((personA, personB))
 					personA.face = personB.face
 					found = True
@@ -152,15 +160,17 @@ def getPosture(img):
 	print('start posture')
 	global imgGLO
 	imgGLO = img
-	print(imgGLO.image)
 	detectedPersons = img.persons #what has been detected by program so far
 	detectedPersonsOP = runOP(img.image)
 	associations = associatePersons(detectedPersons, detectedPersonsOP)
 	for (personA, personB) in associations:
 		(occlusion) = determineHandPositionType(personB.face, personB.leftHandBB, personB.rightHandBB)
 		personA.occlusion = occlusion
+		personA.headPoseOP = True
 		personA.postureLR = shoulderAngle(personB.leftShoulder, personB.rightShoulder)
 		personA.lookingForward = personB.calcHeadPose()
+		cv2.imshow('img', personA.image)
+		cv2.waitKey(0)
 
 
 if __name__ == '__main__':
