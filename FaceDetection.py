@@ -120,7 +120,7 @@ def findFaces(img, mark=False):
 	for face in withoutDups:
 		withoutDupsSingleFace.append(items[0]) #could add a better way to choose the best box - biggest or average them
 	"""
-	withoutDups = removeUnlikelyFaces(withoutDups, 0.5, 2.5)
+	withoutDups = removeUnlikelyFaces(withoutDups, 0.5, 2.5) #was 2.5 originally
 
 	if mark:
 		print('mark')

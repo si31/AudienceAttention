@@ -40,7 +40,8 @@ def runOP(img):
 		keypoints = PersonOPPoints(faces[index], hands[index], person)
 		personOPPointss.append(keypoints)
 	
-	view = False;
+	view = False
+
 	if view:
 		res = op.render(img) #get OP to render the body positions onto the image
 		res = cv2.resize(res, (640,480))
@@ -169,8 +170,6 @@ def getPosture(img):
 		personA.headPoseOP = True
 		personA.postureLR = shoulderAngle(personB.leftShoulder, personB.rightShoulder)
 		personA.lookingForward = personB.calcHeadPose()
-		cv2.imshow('img', personA.image)
-		cv2.waitKey(0)
 
 
 if __name__ == '__main__':

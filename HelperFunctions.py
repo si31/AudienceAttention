@@ -5,6 +5,7 @@ import numpy as np
 import dlib
 import pickle
 import math
+from PIL import ImageDraw, ImageFont
 
 
 def saveImage(img):
@@ -144,14 +145,27 @@ def calcDistance(point1, point2):
 
 FONT = cv2.FONT_HERSHEY_SIMPLEX
 
-def annotateImage(img, bb, val1, val2):
+def annotateImage(image, bb, val1, val2, ratio):
 	(x,y,w,h) = bb
+	(x,y,w,h) = (int(x*ratio) for x in list(bb))
 	boxX = x + w + 10
 	boxY = y
-	boxW = 40
-	boxH = 40
-	cv2.rectangle(img.image, (x,y), (x+w, y+h), (0,255,0), 3)
-	cv2.rectangle(img.image, (boxX, boxY), (boxX+boxW, boxY+boxH), (255,255,255), -1)
-	cv2.putText(img.image, str(val1), (boxX, boxY+boxH-10), FONT, 1, (0,0,0), 2, cv2.LINE_AA)
-	cv2.rectangle(img.image, (boxX, boxY+boxH+10), (boxX+boxW, boxY+2*boxH+10), (255,255,255), -1)
-	cv2.putText(img.image, str(val2), (boxX, boxY+2*boxH), FONT, 1, (0,0,0), 2, cv2.LINE_AA)
+	boxW = 20
+	boxH = 20
+	cv2.rectangle(image, (x,y), (x+w, y+h), (0,255,0), 3)
+	cv2.rectangle(image, (boxX, boxY), (boxX+boxW, boxY+boxH), (255,255,255), -1)
+	cv2.putText(image, str(val1), (boxX, boxY+boxH-5), FONT, 0.5, (0,0,0), 1, cv2.LINE_AA)
+	cv2.rectangle(image, (boxX, boxY+boxH+10), (boxX+boxW, boxY+2*boxH+10), (255,255,255), -1)
+	cv2.putText(image, str(val2), (boxX, boxY+2*boxH+5), FONT, 0.5, (0,0,0), 1, cv2.LINE_AA)
+
+
+def drawTextPIL(img, imagePIL):
+	for person in img.persons:	
+		(x,y,w,h) = person.face
+		boxX = x + w + 10
+		boxY = y
+		boxW = w//4
+		boxH = w//4
+		draw = ImageDraw.Draw(imagePIL)
+		draw.rectangle(((boxX, boxY), (boxX+boxW, boxY+boxH)), fill="gray")
+		draw.text((boxY, boxY), 'hi', font=ImageFont.truetype('/usr/share/fonts/truetype/freefont/FreeSans.ttf'))

@@ -91,13 +91,8 @@ def handleImage(imgName, imgFile=None):
 	if sys.argv[3] == '1':
 		HelperFunctions.saveToDatabase(img, imgName)
 
-	for index, person in enumerate(img.persons): #annotation always happens after saving so the image is not affected
-		HelperFunctions.annotateImage(img, person.face, 42, index)
-
 	if sys.argv[4] == '1':
-		global imgGLO
-		imgGLO = img
-		displayInterface()
+		displayInterface(img)
 		#showImage(img.image)
 		#showAllPeople(img.persons)
 
@@ -105,13 +100,14 @@ def handleImage(imgName, imgFile=None):
 	return img
 
 
-imgGLO = None
 USER_INPUT = None
 root = None
+imgGLO = None
 
 
-def displayInterface():
-	global USER_INPUT, imgGLO, root
+def displayInterface(img):
+	global USER_INPUT, root, imgGLO
+	imgGLO = img
 	root = tk.Tk()
 	USER_INPUT = tk.StringVar(root)
 	root.title("Audience Attention Analyser")
@@ -122,10 +118,11 @@ def displayInterface():
 	tk.Entry(root, textvariable=USER_INPUT).pack()
 	tk.Button(root, text="Go", command=viewPerson).pack()
 	tk.Button(root, text="Quit", command=root.destroy).pack()
-	ratio = (root.winfo_screenwidth() * 0.6)/imgGLO.image.shape[1]
-	width = int(ratio * imgGLO.image.shape[1])
-	height = int(ratio * imgGLO.image.shape[0])
-	imgToShow = cv2.resize(imgGLO.image, (width,height), interpolation=cv2.INTER_LINEAR);
+	ratio = 1150/img.image.shape[1]
+	height = int(ratio * img.image.shape[0])
+	imgToShow = cv2.resize(img.image, (1150,height), interpolation=cv2.INTER_LINEAR);
+	for index, person in enumerate(img.persons): #annotation always happens after saving so the image is not affected
+		HelperFunctions.annotateImage(imgToShow, person.face, 42, index, ratio)
 	imgToShow = cv2.cvtColor(imgToShow, cv2.COLOR_BGR2RGB)
 	imgPIL = PILIm.fromarray(imgToShow)
 	imgTk = ImageTk.PhotoImage(imgPIL)

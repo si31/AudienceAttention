@@ -1,5 +1,6 @@
 import sys
 import os
+import cv2 
 
 from Person import Person, LabelsForPerson, accumulateData, printData
 from Image import Image
@@ -43,15 +44,16 @@ def runImage():
 
 	accumulateData(person)
 	printData(person)
-
-	imgPIL0 = PILIm.fromarray(person.image)
+	imgToShow = cv2.cvtColor(person.image, cv2.COLOR_BGR2RGB)
+	imgPIL0 = PILIm.fromarray(imgToShow)
 	imgTk0 = ImageTk.PhotoImage(imgPIL0)
 	imgView0 = tk.Label(image=imgTk0)
 	label0 = tk.Label(text=str(index))
 	label0.pack(side=tk.LEFT)
 	imgView0.pack(side=tk.LEFT)
 
-	imgPIL = PILIm.fromarray(person.imageExtra)
+	imgToShowExtra = cv2.cvtColor(person.imageExtra, cv2.COLOR_BGR2RGB)
+	imgPIL = PILIm.fromarray(imgToShowExtra)
 	imgTk = ImageTk.PhotoImage(imgPIL)
 	imgView = tk.Label(image=imgTk)
 	imgView.pack(side=tk.LEFT)
@@ -126,7 +128,7 @@ def getLabelObject(person):
 
 
 def nextImage(val):
-	MAX_PHASE = 2
+	MAX_PHASE = 6
 	global img, phase, labelsForPerson, index, root
 	person = img.persons[index]
 	if phase == 0:
@@ -154,7 +156,7 @@ def nextImage(val):
 			exit()
 		phase = 0
 	else:
-		phase += 2
+		phase += 1
 	root.destroy()
 	root = tk.Tk()
 	root.title("Audience Attention Labeller")

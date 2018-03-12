@@ -60,16 +60,22 @@ def varianceTwoImagesSingleChannel(img1, img2):
 
 def findMovement(img):
 	print('Finding Movement...')
-	average = 0
+	datapoints = []
 	for person in img.persons:
-		average += person.blur
-	average = average / len(img.persons)
-	average *= 3
+		(x,y,w,h) = person.face
+		datapoints.append((y,person.blur))
+	x = [i[0] for i in datapoints]
+	y = [i[1] for i in datapoints]
+	linearRegressionModel = MachineLearning.createLinearRegressionModel(x,y,plot=False)
+	numRemoved = 0
 	for person in img.persons:
-		if person.blur > average:
-			print('hi')
-			cv2.imshow('img', person.image)
-			cv2.waitKey(0)
+		(x,y,w,h) = person.face
+		predictedBlur = MachineLearning.linearRegressionPredict(linearRegressionModel, y)
+		print('Predicted: ' + str(predictedBlur[0]))
+		print('Actual: ' + str(person.blur))
+		print('Ratio: ' + str(predictedBlur[0]/person.blur))
+		cv2.imshow('img', person.image)
+		cv2.waitKey(0)
 
 
 def blur(image):
