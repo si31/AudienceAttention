@@ -8,15 +8,15 @@ class Video:
 		self.frames = [] #image objects
 		self.persons = [] #array of videoPerson objects
 
-	def collatePersons(self):
+	def collatePersons(self): #run command here
 		for person in frames[0].persons:
-			videoPerson = VideoPerson(person)
-			self.persons.append(videoPerson, 0)
+			videoPerson = VideoPerson(person, 0)
+			self.persons.append(videoPerson)
 		for index, frame in enumerate(self.frames[1:]):
-			for personInFrame in frame2.persons:
-				trackPersonsAcrossFrames(index, personInFrame, nextFrame)
+			for personInFrame in frame.persons:
+				trackPersonAcrossFrames(index, personInFrame)
 
-	def trackPersonAcrossTwoFrames(index, personInFrame, nextFrame): #each are Image objects
+	def trackPersonAcrossTwoFrames(index, personInFrame): #personinframe is an Image object 
 		found = False
 		for videoPerson in self.persons:
 			if HelperFunctions.bbOverLapRatio(personInFrame.face, videoPerson.averagePosition) > 0.1:
@@ -32,8 +32,8 @@ class Video:
 
 class VideoPerson:
 
-	def __init__(self, initalFramePerson, initalFrameIndex):
-		self.imagePersons = [None] * len(self.frames) # length of no. of frames, each points to the person in the frame or None if no person detected
+	def __init__(self, initalFramePerson, initalFrameIndex): #initial frame index is the index of the frame they were first seen in
+		self.imagePersons = [None] * len(self.frames) # length of no. of frames, each points to the person in the frame or None if no person detected, image objects
 		self.imagePersons[initalFrameIndex] = initalFramePerson 
 		self.averagePosition = (0,0,0,0)
 		self.averageAttention = 0
@@ -42,11 +42,11 @@ class VideoPerson:
 	def addFrame(self, personInFrame, frameIndex):
 		self.imagePersons[frameIndex] = personInFrame
 		self.numberOfFramesIn += 1
-		self.averagePosition = self.newAveragePosition(personInFrame.face)
+		self.averagePosition = self.calcNewAveragePosition(personInFrame.face)
 
 	def calcNewAveragePosition(self, newPosition):
 		(x1,y1,w1,h1) = self.averagePosition
-		(x2,y2,w2,h2) = self.face
+		(x2,y2,w2,h2) = newPosition
 		self.averagePosition = ((x1+x2)//2,(y1+y2)//2,(w1+w2)//2,(h1+h2)//2)
 
 	def calcAverageAttention(self):

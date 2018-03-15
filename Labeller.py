@@ -58,7 +58,7 @@ def runImage():
 	imgView = tk.Label(image=imgTk)
 	imgView.pack(side=tk.LEFT)
 
-	elementsToPack = []
+		elementsToPack = []
 	
 	if phase == 0:
 		#buttons to select face

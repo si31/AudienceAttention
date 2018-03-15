@@ -64,12 +64,7 @@ def calculateAttention(img):
 	else:
 		print('Estimating attention...')
 
-def handleImage(imgName, imgFile=None):
-
-	if imgFile is None:
-		print('Reading image...')
-		imgFile = cv2.imread('imgsInDatabase/'+imgName)
-	
+def handleImage(imgName, imgFile):
 	img = None
 	if HelperFunctions.inDatabase(imgName) and sys.argv[2] == '3':
 		img = HelperFunctions.readFromDatabase(imgName)
@@ -88,15 +83,6 @@ def handleImage(imgName, imgFile=None):
 		for person in img.persons:
 			accumulateData(person)
 
-	if sys.argv[3] == '1':
-		HelperFunctions.saveToDatabase(img, imgName)
-
-	if sys.argv[4] == '1':
-		displayInterface(img)
-		#showImage(img.image)
-		#showAllPeople(img.persons)
-
-	print('End')
 	return img
 
 
@@ -137,28 +123,52 @@ def viewPerson():
 	printData(person)
 
 
+def handleImageFile(imgName):
+	print('Reading image...')
+	imgFile = cv2.imread('imgsInDatabase/'+imgName)
+	img = handleImage(imgName, imgFile)
 
-def handleVideo(vidName, frameInterval):
+	if sys.argv[3] == '1':
+		HelperFunctions.saveToDatabase(img, imgName)
+
+	if sys.argv[4] == '1':
+		displayInterface(img)
+
+
+def handleVideoFile(vidName, frameInterval):
 	print('Reading video...')
 
-	cap = cv2.VideoCapture('imgsInDatabase/'+vidName)
-	video = Video()
-	i = 0
+	if HelperFunctions.inDatabase(vidName) and sys.argv[2] > 0:
+		video = HelperFunctions.readFromDatabase(vidName)
+	else:	
+		cap = cv2.VideoCapture('imgsInDatabase/'+vidName)
+		video = Video()
+		i = 0
 
-	while(cap.isOpened()):
-		ret, frame = cap.read()
-		i += 1
-		if i % frameInterval != 0:
-			continue
-		video.frameImages.append(frame)
-		video.frames.append(handleImage(vidName, frame))
+		while(cap.isOpened()):
+			ret, frame = cap.read()
+			i += 1
+			if i % frameInterval != 0:
+				continue
+			video.frameImages.append(frame)
+			video.frames.append(handleImage(vidName, frame))
+			print('Frame ' + str(i//frameInterval) + ' completed.')
+		cap.release()
+		cv2.destroyAllWindows()
 
-	cap.release()
-	cv2.destroyAllWindows()
+		video.collatePersons()
 
-	video.collatePersons()
+	if sys.argv[3] == '1':
+		HelperFunctions.saveToDatabase(video, vidName)
+
+	if sys.argv[4] == '1':
+		displayInterface(img)
+
+	#run viewer on frame with mode people in, plus give option of graphs and each person's graph
+
 
 def main():
+	print('-----------------------------')
 	print('Usage: file name, use saved if available (3=used saved everything, 2=used saved redo attention, 1=used saved faces, 0=redo everything), save to database, view faces')	
 	print('Start...')
 	
@@ -168,11 +178,14 @@ def main():
 
 	fileName = sys.argv[1]
 	if fileName.endswith('.jpg') or fileName.endswith('.png'):
-		handleImage(fileName)
+		handleImageFile(fileName)
 	elif fileName.endswith('.mp4'):
-		handleVideo(fileName, 10)
+		handleVideoFile(fileName, 15)
 	else:
 		print('Input file is of wrong type. Please use .jpg or .png for images and .mp4 for videos.')
+
+	print('End')
+
 
 if __name__ == "__main__":
 	main()
