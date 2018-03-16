@@ -82,6 +82,30 @@ def removeUnlikelyFaces(detected, minFactor, maxFactor):
 	return detected
 
 
+def removeUnlikelyFacesFinal(detected, minFactor, maxFactor): #for final one
+	print('Removing unlikely faces...')
+	datapoints = []
+	for person in detected:
+		(x,y,w,h) = person.face
+		datapoints.append((y, math.sqrt(w*h)))
+	x = [i[0] for i in datapoints]
+	y = [i[1] for i in datapoints]
+	linearRegressionModel = MachineLearning.createLinearRegressionModel(x,y,plot=False)
+	numRemoved = 0
+	for person in detected:
+		(x,y,w,h) = person.face
+		predictedArea = MachineLearning.linearRegressionPredict(linearRegressionModel, y)
+		if (math.sqrt(w*h) < predictedArea*minFactor or math.sqrt(w*h) > predictedArea * maxFactor):
+			numRemoved += 1
+			detected.remove(person)
+	print(numRemoved)
+	if numRemoved > len(detected)*0.025:
+		detected = removeUnlikelyFacesFinal(detected, minFactor*1.1 if minFactor < 0.7 else minFactor, maxFactor*0.9 if maxFactor > 1.75 else maxFactor)
+
+	return detected
+
+
+
 def findFaces(img, mark=False):
 	print('Detecting faces...')
 	cascades = getCascades()

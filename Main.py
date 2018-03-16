@@ -53,6 +53,7 @@ def detectFeatures(img):
 	ComputerVision.findEars(img, mark=False)
 	PostureDetection.getPosture(img)
 	ComputerVision.finalMerge(img)
+	FaceDetection.removeUnlikelyFacesFinal(img.persons, 0.25, 2.25)
 	#ComputerVision.findMovement(img)
 
 
@@ -90,9 +91,10 @@ def handleImage(imgName, imgFile):
 USER_INPUT = None
 root = None
 imgGLO = None
+videoGLO = None
 
 
-def displayInterface(img):
+def displayInterface(img, video=None):
 	global USER_INPUT, root, imgGLO
 	imgGLO = img
 	root = tk.Tk()
@@ -103,7 +105,10 @@ def displayInterface(img):
 	tk.Label(root, text="Overall Attention = ").pack()
 	tk.Label(root, text="View person: ").pack()
 	tk.Entry(root, textvariable=USER_INPUT).pack()
-	tk.Button(root, text="Go", command=viewPerson).pack()
+	tk.Button(root, text="Print details of person", command=viewPerson).pack()
+	if video:
+		tk.Button(root, text="View attention graph of person", command=viewGraphOfPerson).pack()
+		tk.Button(root, text="View attention graph of group", command=viewGraphOfAttention).pack()
 	tk.Button(root, text="Quit", command=root.destroy).pack()
 	ratio = 1150/img.image.shape[1]
 	height = int(ratio * img.image.shape[0])
@@ -115,6 +120,27 @@ def displayInterface(img):
 	imgTk = ImageTk.PhotoImage(imgPIL)
 	imgView = tk.Label(image=imgTk).pack(side=tk.BOTTOM)
 	root.mainloop()
+
+
+def viewGraphOfPerson():
+	global USER_INPUT, imgGLO, videoGLO
+	video = videoGLO
+	index = int(USER_INPUT.get())
+	person = imgGLO.persons[index]
+	videoPersonSelected = None
+	for videoPerson in video.persons:
+		if person in videoPerson.imagePerson:
+			print('Found person')
+			videoPersonSelected = videoPerson
+	#display graph
+
+
+def viewGraphOfAttention():
+	global USER_INPUT, imgGLO
+	index = int(USER_INPUT.get())
+	person = imgGLO.persons[index]
+	printData(person)
+	pass
 
 
 def viewPerson():
@@ -165,14 +191,16 @@ def handleVideoFile(vidName, frameInterval):
  
 		video.collatePersons()
 
-	for person in video.persons:
+	for person in video.persons:    
 		print(person.imagePersons)
 
 	if sys.argv[3] == '1':
 		HelperFunctions.saveToDatabase(video, vidName)
 
-	#if sys.argv[4] == '1':
-	#	displayInterface(img)
+	if sys.argv[4] == '1':
+		global videoGLO
+		videoGLO = video
+		displayInterface(video.frameWithMostDetections())
 
 	#run viewer on frame with mode people in, plus give option of graphs and each person's graph
 
