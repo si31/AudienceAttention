@@ -22,13 +22,7 @@ def getArms(img, mark=False):
 	lower = int(max(0, (1.0 - sigma) * v))
 	upper = int(min(255, (1.0 + sigma) * v))
 	edged = cv2.Canny(tight, lower, upper)
- 
-	cv2.imshow('name', img)
-	cv2.waitKey(0)
-	cv2.imshow('name', edged)
-	cv2.waitKey(0)
 
-	pass
 
 def sittingBodyShapeOnly(imageExtra, face):
 	shape = imageExtra.shape
@@ -116,12 +110,11 @@ def detectSkin(person):
 	#cv2.waitKey(0)
 	return skin
 
+
 def detectSkin2(person):
 	img = person.image
 	chromed = cv2.cvtColor(img, cv2.COLOR_BGR2YUV)
 	mask = np.zeros(img.shape)
-
-	print(img.shape)
 
 	lower = np.array([25, 25, 25])
 	uppper = np.array([200,200,200])
@@ -181,4 +174,3 @@ def getSkin(person):
 
 if __name__ == "__main__":
 	detectHands(cv2.imread('imgsInDatabase/fake1.png'))#readFromDatabase('ArmTest/arm5').imageExtra)
-

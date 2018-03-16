@@ -17,7 +17,6 @@ OPENPOSE_ROOT = "/home/simon/openpose"
 
 
 def runOP(img):
-
 	height, width = img.shape[0:2]
 
 	renderHeight = 480
@@ -100,7 +99,6 @@ class PersonOPPoints:
 		maxDistance = self.face[2]/4
 		xOfBody = self.centreBody[0]
 		xOfFace = self.centreFace[0]
-		print('next')
 		side = (math.fabs(xOfFace-xOfBody) > maxDistance)
 		if xOfFace == 0 or xOfBody == 0:
 			side = False
@@ -110,16 +108,10 @@ class PersonOPPoints:
 		rightLower = (self.rightSideOfHead[1] - self.rightEye[1] < maxDistance/2)
 		if self.rightSideOfHead[1] == 0 or self.leftEye[1] == 0:
 			rightLower = False
-		print(side)
-
 		faceToBody = HelperFunctions.calcDistance(self.centreFace[0:2], self.centreBody[0:2])
-		print(faceToBody)
-		print(maxDistance*2)
 		if side or faceToBody < maxDistance*1.75:#leftLower or rightLower:
-			print('no')
 			return 0
 		else:
-			print('yes')
 			return 1
 		#OPHead = (HelperFunctions.calcDistance(self.leftEye[0:2], self.leftSideOfHead[0:2]) < maxDistance and HelperFunctions.calcDistance(self.rightEye[0:2], self.rightSideOfHead[0:2]) < maxDistance)
 
@@ -158,7 +150,6 @@ imgGLO = None
 
 
 def getPosture(img):
-	print('start posture')
 	global imgGLO
 	imgGLO = img
 	detectedPersons = img.persons #what has been detected by program so far

@@ -33,6 +33,7 @@ def collectImages():
 		imagesNegTest.append(img)
 	return imagesPosTrain, imagesPosTest, imagesNegTrain, imagesNegTest
 
+
 def detectFromCascade(images):
 	cascadePath = '/Users/admin/Documents/AudienceAttention/haar_training/haarcascade/cascade.xml'
 	cascade = cv2.CascadeClassifier(cascadePath)
@@ -40,8 +41,8 @@ def detectFromCascade(images):
 	for img in images:
 		detected = cascade.detectMultiScale(img, 1.01, 1)
 		results.append(len(detected))
-
 	return results
+
 
 def main():
 	print('Start...')
@@ -68,7 +69,6 @@ def main():
 	else:
 		results = detectFromCascade(imagesNegTrain)
 		print(results)
-	
 	
 	
 if __name__ == "__main__":

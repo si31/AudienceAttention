@@ -96,16 +96,13 @@ def getPose(person, imgShape, openPose=False, mark=False):
 
 	if mark:
 		#draw(image, tuple(faceMarkers[0][0]), nose_end_point2D)
-		
 		cv2.line(person.image, p1, p2, (255,0,0),2)
-		
 		for p in faceMarkers:
 			cv2.circle(person.image, (int(p[0]), int(p[1])), 3, (0,0,255), -1)
 
 
 def draw(img, origin, points):
 	origin = tuple([int(p) for p in origin])[0:2]
-	print(points)
 	img = cv2.line(img, origin, tuple([int(p) for p in points[0][0]]), (255,0,0), 4)
 	img = cv2.line(img, origin, tuple([int(p) for p in points[1][0]]), (0,255,0), 4)
 	img = cv2.line(img, origin, tuple([int(p) for p in points[2][0]]), (0,0,255), 4)

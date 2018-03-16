@@ -66,6 +66,7 @@ def calculateAttention(img):
 
 def handleImage(imgName, imgFile):
 	img = None
+
 	if HelperFunctions.inDatabase(imgName) and sys.argv[2] == '3':
 		img = HelperFunctions.readFromDatabase(imgName)
 	else:
@@ -137,39 +138,49 @@ def handleImageFile(imgName):
 
 def handleVideoFile(vidName, frameInterval):
 	print('Reading video...')
-
-	if HelperFunctions.inDatabase(vidName) and sys.argv[2] > 0:
+	if HelperFunctions.inDatabase(vidName) and (sys.argv[2] == '2' or sys.argv[2] == '3'):
+		print('Using saved version...')
 		video = HelperFunctions.readFromDatabase(vidName)
-	else:	
-		cap = cv2.VideoCapture('imgsInDatabase/'+vidName)
+		if sys.argv[2] == '2':
+			video.collatePersons()
+	else:
+		print('Recalculating...')
+		file = cv2.VideoCapture('imgsInDatabase/'+vidName)
 		video = Video()
 		i = 0
 
-		while(cap.isOpened()):
-			ret, frame = cap.read()
-			i += 1
-			if i % frameInterval != 0:
-				continue
-			video.frameImages.append(frame)
-			video.frames.append(handleImage(vidName, frame))
-			print('Frame ' + str(i//frameInterval) + ' completed.')
-		cap.release()
+		while(file.isOpened()):
+			ret, frame = file.read()
+			if ret and frame is not None:
+				i += 1
+				if i % frameInterval != 0:
+					continue
+				video.frameImages.append(frame)
+				video.frames.append(handleImage(vidName, frame))
+				print('Frame ' + str(i//frameInterval) + ' completed.')
+			else:
+				break
+		file.release()
 		cv2.destroyAllWindows()
-
+ 
 		video.collatePersons()
+
+	for person in video.persons:
+		print(person.imagePersons)
 
 	if sys.argv[3] == '1':
 		HelperFunctions.saveToDatabase(video, vidName)
 
-	if sys.argv[4] == '1':
-		displayInterface(img)
+	#if sys.argv[4] == '1':
+	#	displayInterface(img)
 
 	#run viewer on frame with mode people in, plus give option of graphs and each person's graph
 
 
 def main():
 	print('-----------------------------')
-	print('Usage: file name, use saved if available (3=used saved everything, 2=used saved redo attention, 1=used saved faces, 0=redo everything), save to database, view faces')	
+	print('Usage: file name, use saved if available (3=used saved everything, 2=used saved redo attention, 1=used saved faces, 0=redo everything), save to database, view faces')
+	print('For Video: (3=used saved everything, 2=redo the collation, 1,0=redo everything')
 	print('Start...')
 	
 	if len(sys.argv) < 5:

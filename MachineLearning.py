@@ -13,6 +13,7 @@ def plotScatter(x, y):
 	plt.ylabel('y')
 	plt.show()
 
+
 def createLinearRegressionModel(x,y, plot=False):
 	xArr = [[val] for val in x]
 
@@ -33,11 +34,12 @@ def createLinearRegressionModel(x,y, plot=False):
 
 	return model
 
+
 def linearRegressionPredict(model, val):
 	return model.coef_ * val + model.intercept_
 
+
 def createPolynomialRegressionModel(x,y,n,plot=False):
-	
 	poly = np.poly1d(np.polyfit(x,y,n))
 
 	if plot:
@@ -53,15 +55,11 @@ def createPolynomialRegressionModel(x,y,n,plot=False):
 		plt.show()
 
 	return model	
-	pass
+
 
 def learn(arrays):
 	pass
 
 
-
 def test(array):
 	pass
-
-
-

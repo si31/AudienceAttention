@@ -41,14 +41,10 @@ def eyeExtractor():
 		cv2.waitKey(0)
 
 
-
 def detectEyesOpen():
 	img = cv2.imread('imgsInDatabase/'+sys.argv[1])
-
 	cascade = cv2.CascadeClassifier('/usr/local/Cellar/opencv/3.3.0_3/share/OpenCV/haarcascades/haarcascade_eye.xml')
-
 	detected = cascade.detectMultiScale(img, 1.1, 1)
-
 	hogView1 = None
 
 	for face in detected:
@@ -60,15 +56,11 @@ def detectEyesOpen():
 		cv2.imshow('img1',eye1)
 		cv2.imshow('img2',hogView1)
 		cv2.waitKey(0)
-
 		#cv2.rectangle(img,(x,y),(x+w,y+h),(0,0,255),2)
-
 
 
 	cv2.imshow('img', img)
 	cv2.waitKey(0)
-
-
 
 
 if __name__ == "__main__":

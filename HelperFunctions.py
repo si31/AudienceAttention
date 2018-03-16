@@ -44,7 +44,6 @@ def inDatabase(imgName):
 
 #based on tutorial / post
 def bbOverLapRatio(bb1, bb2):
-
 	[bb1x1,bb1y1,w,h] = bb1
 	[bb2x1,bb2y1,w,h] = bb2
 
@@ -144,6 +143,7 @@ def calcDistance(point1, point2):
 
 
 FONT = cv2.FONT_HERSHEY_SIMPLEX
+
 
 def annotateImage(image, bb, val1, val2, ratio):
 	(x,y,w,h) = bb

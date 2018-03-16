@@ -72,20 +72,20 @@ def convertImage(img):
 
 
 def openCVHOG(img):
-		#resize
-		img = cv2.resize(img, (width,height), interpolation=cv2.INTER_LINEAR);
+	#resize
+	img = cv2.resize(img, (width,height), interpolation=cv2.INTER_LINEAR);
 
-		#img = np.float32(img) / 255.0
-		#img = np.uint8(img)
+	#img = np.float32(img) / 255.0
+	#img = np.uint8(img)
 
-		#img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
-		hog = cv2.HOGDescriptor((width,height), (cellsize,cellsize), (cellsize,cellsize), (cellsize,cellsize), 9)
-		#svm = pickle.load(open("svm.pickle"))
-		#hog.setSVMDetector( np.array(svm) )
-		#del svm
-		#found, w = hog.detectMultiScale(img)
-		output = hog.compute(img)
-		return output
+	#img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+	hog = cv2.HOGDescriptor((width,height), (cellsize,cellsize), (cellsize,cellsize), (cellsize,cellsize), 9)
+	#svm = pickle.load(open("svm.pickle"))
+	#hog.setSVMDetector( np.array(svm) )
+	#del svm
+	#found, w = hog.detectMultiScale(img)
+	output = hog.compute(img)
+	return output
 
 
 

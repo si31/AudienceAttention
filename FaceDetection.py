@@ -45,6 +45,7 @@ def getCascades():
 		cascades.append(cv2.CascadeClassifier(cascadePath))
 	return cascades
 
+
 def splitImageVertically(img, n):
 	n += 1
 	interval = img.shape[1]//n
@@ -57,6 +58,7 @@ def splitImageVertically(img, n):
 			upperVal = img.shape[1]
 		sections.append((img[lowerVal:upperVal, 0:img.shape[0]], lowerVal))
 	return sections[:-1]
+
 
 def removeUnlikelyFaces(detected, minFactor, maxFactor):
 	print('Removing unlikely faces...')
@@ -78,6 +80,7 @@ def removeUnlikelyFaces(detected, minFactor, maxFactor):
 		detected = removeUnlikelyFaces(detected, minFactor*1.1 if minFactor < 0.7 else minFactor, maxFactor*0.9 if maxFactor > 1.75 else maxFactor)
 
 	return detected
+
 
 def findFaces(img, mark=False):
 	print('Detecting faces...')
@@ -123,7 +126,6 @@ def findFaces(img, mark=False):
 	withoutDups = removeUnlikelyFaces(withoutDups, 0.5, 2.5) #was 2.5 originally
 
 	if mark:
-		print('mark')
 		#just for visual markers of each face
 		for item in withoutDups:
 			((x,y,w,h),cascadeIdentifier,totalInGroup) = item 
