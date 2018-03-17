@@ -5,6 +5,8 @@ import numpy as np
 import uuid
 import base64
 import pickle
+import tkinter as tk
+from PIL import ImageTk, Image as PILIm
 
 import FaceDetection
 import ComputerVision
@@ -13,12 +15,11 @@ import HeadDirection
 import PostureDetection
 import HelperFunctions
 import HAAR
+import GraphCreator
 
 from Person import Person, accumulateData, printData
 from Image import Image
 from Video import Video
-import tkinter as tk
-from PIL import ImageTk, Image as PILIm
 
 def showImage(img):
 	print('Showing image...')
@@ -94,7 +95,7 @@ imgGLO = None
 videoGLO = None
 
 
-def displayInterface(img, video=None):
+def displayInterface(img, video=False):
 	global USER_INPUT, root, imgGLO
 	imgGLO = img
 	root = tk.Tk()
@@ -129,10 +130,17 @@ def viewGraphOfPerson():
 	person = imgGLO.persons[index]
 	videoPersonSelected = None
 	for videoPerson in video.persons:
-		if person in videoPerson.imagePerson:
+		print('1')
+		print(videoPerson.imagePersons)
+		if person in videoPerson.imagePersons:
 			print('Found person')
 			videoPersonSelected = videoPerson
 	#display graph
+	data = [(val.attention, index) for index, val in enumerate(videoPersonSelected.imagePersons) if val is not None]
+	print(data)
+	xData = [a for a,b in data]
+	yData = [b for a,b in data]
+	GraphCreator.createGraph(xData, yData, 'hi', 'bye', 'poo')
 
 
 def viewGraphOfAttention():
@@ -153,6 +161,11 @@ def viewPerson():
 def handleImageFile(imgName):
 	print('Reading image...')
 	imgFile = cv2.imread('imgsInDatabase/'+imgName)
+
+	if imgFile is None:
+		print('File could not be read')
+		return
+
 	img = handleImage(imgName, imgFile)
 
 	if sys.argv[3] == '1':
@@ -200,7 +213,7 @@ def handleVideoFile(vidName, frameInterval):
 	if sys.argv[4] == '1':
 		global videoGLO
 		videoGLO = video
-		displayInterface(video.frameWithMostDetections())
+		displayInterface(video.frameWithMostDetections(), True)
 
 	#run viewer on frame with mode people in, plus give option of graphs and each person's graph
 

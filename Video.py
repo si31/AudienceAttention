@@ -36,13 +36,10 @@ class Video:
 		if not found:
 			self.persons.append(VideoPerson(personInFrame, index, self))
 
-	def fillInFrameHoles():
+	def fillInFrameHoles(self):
 		pass # fill in frames that do not have a person in from not being detected
 
-	def createGraph():
-		pass
-
-	def calculateOverallAttention():
+	def calculateOverallAttention(self):
 		for videoPerson in self.persons:
 			self.attention += videoPerson.averageAttention
 		self.attention = self.attention / len(self.persons)
