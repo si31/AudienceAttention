@@ -58,7 +58,7 @@ def runImage():
 	imgView = tk.Label(image=imgTk)
 	imgView.pack(side=tk.LEFT)
 
-		elementsToPack = []
+	elementsToPack = []
 	
 	if phase == 0:
 		#buttons to select face
@@ -129,7 +129,7 @@ def getLabelObject(person):
 
 def nextImage(val):
 	MAX_PHASE = 6
-	global img, phase, labelsForPerson, index, root
+	global img, phase, labelsForPerson, index, root, objToSave
 	person = img.persons[index]
 	if phase == 0:
 		labelsForPerson = getLabelObject(person)
@@ -151,7 +151,7 @@ def nextImage(val):
 	if phase == MAX_PHASE:
 		index += 1
 		#labelsForPerson.data = [labelsForPerson.humanEyeAngle, labelsForPerson.humanMovement, labelsForPerson.humanOcclusion, labelsForPerson.humanPostureLR]
-		HelperFunctions.saveToDatabase(img, sys.argv[1])
+		HelperFunctions.saveToDatabase(objToSave, sys.argv[1])
 		if index > len(img.persons)-1:
 			exit()
 		phase = 0
@@ -169,15 +169,69 @@ index = 0
 phase = 0
 labelsForPerson = None
 labelIdentifier = ""
+objToSave = None
+
+
+def mainVideo():
+	global img, labelIdentifier, root, index, objToSave
+
+	# looking through the video, participant looks at a person throughout and then gives a score of their attention overall. do for each person in the mode frame
+
+	print('Usage: vidName, command, label identifier, startFrom, frame')
+	video = HelperFunctions.readFromDatabase(sys.argv[1])
+	command = sys.argv[2]
+
+	img = video.frameWithMostDetections()
+
+	objToSave = video
+
+	print(len(img.persons))
+
+	if command == "ls":
+		examplePerson = img.persons[0]
+		identifiers = [label.labelIdentifier for label in examplePerson.labels]
+		if len(identifiers) == 0:
+			print('no identifiers found')
+		else:
+			print('--')
+			for identifier in identifiers:
+				print(identifier)
+			print('--')
+
+	elif command == "clear-make-sure":
+		for person in img.persons:
+			person.labels = []
+		HelperFunctions.saveToDatabase(objToSave, sys.argv[1])
+
+	elif command == "new":
+		labelIdentifier = sys.argv[3]
+		root = tk.Tk()  
+		root.title("Audience Attention Labeller")
+		index = int(sys.argv[4])
+		runImage()
+
+	elif command == "delete":	
+		labelIdentifier = sys.argv[3]
+		for person in img.persons:
+			for label in person.labels:
+				if label.labelIdentifier == labelIdentifier:
+					person.labels.remove(label)
+		HelperFunctions.saveToDatabase(img, sys.argv[1])
+
+	print('End')
+
 
 def main():
 	
-	global img, labelIdentifier, root, index
+	global img, labelIdentifier, root, index, objToSave
+
 	print('Usage: imgName, command, label identifier, startFrom')
 	img = HelperFunctions.readFromDatabase(sys.argv[1])
 	command = sys.argv[2]
 
 	print(len(img.persons))
+
+	objToSave = img
 
 	if command == "ls":
 		examplePerson = img.persons[0]
@@ -215,4 +269,4 @@ def main():
 
 
 if __name__ == "__main__":
-	main()
+	mainVideo()
