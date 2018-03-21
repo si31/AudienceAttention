@@ -49,19 +49,32 @@ def analyseData(data):
 	count2 = 0
 	count3 = 0
 	count4 = 0
-	for ([computerBlur, computerLookingForward, computerPostureLR, computerOcclusion], [humanFace, humanMovement, humanPoseAngle, humanPostureLR, humanOcclusion, humanEyeAngle]) in data:
-		if humanFace != 0:
-			if computerOcclusion != -1:
-				if humanOcclusion == 1:
-					if computerOcclusion == 1:
-						count1 += 1
-					else:
-						count2 += 1
+	for ([computerBlur, computerLookingForward, computerPostureArea, computerOcclusion], [humanFace, humanMovement, humanPoseAngle, humanPostureLR, humanOcclusion, humanEyeAngle]) in data:
+		if humanFace == 1:
+			if computerPostureArea is not None:		
+				if computerPostureArea == humanPostureLR:
+					count1 += 1
 				else:
-					if computerOcclusion != 1:
-						count3 += 1
-					else:
-						count4 += 1
+					count2 += 1
+			else:
+				count3 += 1
+			""" occlusion
+			if computerOcclusion != -1:
+				if computerOcclusion == humanOcclusion:
+					count1 += 1
+				else:
+					count2 += 1
+			else:
+				count3 += 1
+			"""
+			""" pose
+			if computerLookingForward == 1 and humanPoseAngle == 5:
+				count1 += 1
+			else:
+				count2 += 1
+			"""
+		else:
+			count4 += 1
 
 	print('Count1: ' + str(count1))
 	print('Count2: ' + str(count2))

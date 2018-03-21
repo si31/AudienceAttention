@@ -62,6 +62,9 @@ def splitImageVertically(img, n):
 
 def removeUnlikelyFaces(detected, minFactor, maxFactor):
 	print('Removing unlikely faces...')
+	if len(detected) == 0:
+		print('None detected')
+		return detected
 	datapoints = []
 	for face in detected:
 		((x,y,w,h),cascadeIdentifier, totalInGroup) = face
@@ -84,6 +87,9 @@ def removeUnlikelyFaces(detected, minFactor, maxFactor):
 
 def removeUnlikelyFacesFinal(detected, minFactor, maxFactor): #for final one
 	print('Removing unlikely faces...')
+	if len(detected) == 0:
+		print('None detected')
+		return detected
 	datapoints = []
 	for person in detected:
 		(x,y,w,h) = person.face
@@ -98,7 +104,6 @@ def removeUnlikelyFacesFinal(detected, minFactor, maxFactor): #for final one
 		if (math.sqrt(w*h) < predictedArea*minFactor or math.sqrt(w*h) > predictedArea * maxFactor):
 			numRemoved += 1
 			detected.remove(person)
-	print(numRemoved)
 	if numRemoved > len(detected)*0.025:
 		detected = removeUnlikelyFacesFinal(detected, minFactor*1.1 if minFactor < 0.7 else minFactor, maxFactor*0.9 if maxFactor > 1.75 else maxFactor)
 

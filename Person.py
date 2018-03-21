@@ -44,7 +44,7 @@ def printData(person):
 	print('-----')
 	print('Blur: ' + str(person.blur))
 	print('Looking forward: ' + str(person.lookingForward))
-	print('Posture LR: ' + str(person.postureLR))
+	print('Posture Area: ' + str(person.postureArea))
 	print('Occlusion: ' + str(person.occlusion))
 	print('Ear detected: ' + str(person.earDetected))
 	print('Attention: ' + str(person.attention))
@@ -81,15 +81,16 @@ def accumulateData(person):
 			person.lookingForward = 0
 		else:
 			person.lookingForward = 1
-
-	if person.postureLR < -15:
-		person.postureArea = 0
-	elif person.postureLR > 15:
+	if person.postureLR == -1.0:
+		person.postureArea = None
+	elif person.postureLR < -0.10:
 		person.postureArea = 2
+	elif person.postureLR > 0.10:
+		person.postureArea = 0
 	else:
 		person.postureArea = 1
 		
-	person.data = [person.blur, person.lookingForward, person.postureLR, person.occlusion]#, person.attention]
+	person.data = [person.blur, person.lookingForward, person.postureArea, person.occlusion]#, person.attention]
 
 
 class LabelsForPerson:
