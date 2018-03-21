@@ -1,0 +1,40 @@
+Face Detections:
+
+img1 105
+img2 44
+img3 21
+img4a 22
+img4b 24
+img4c 25
+img5 not using
+img6 9
+img7 9
+img8 8
+img9a 8
+img9b 8
+img9c 8
+img10 22
+
+Total = 303
+Total detected = 295
+Incorrect = 31
+Total detected minus incorrect = 264
+Ratio = 264/303 = 87%
+
+Head Pose:
+
+Total looking forward = 156
+Correctly identified looking forward = 149
+Ratio = 96%
+
+Total looking away = 108
+Correctly identified looking away = 73
+Ratio = 68%
+
+Average (weighted for no. of detections) = 84%
+
+Average (equal weights) = 82%
+
+TPR, FNR
+
+
