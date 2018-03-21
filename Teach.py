@@ -2,6 +2,8 @@ import os
 import sys
 import cv2
 import numpy as np
+import math
+
 from Person import Person, accumulateData, printData
 from Image import Image
 import HelperFunctions
@@ -38,7 +40,7 @@ def collateData():
 				if person.labels != []:
 					label = person.labels[0]
 					labelData = [label.humanFace, label.humanMovement, label.humanPoseAngle, label.humanPostureLR, label.humanOcclusion, label.humanEyeAngle]
-					data.append((person.data, labelData))
+					data.append((person.data, labelData, person.face))
 	return data
 
 
@@ -49,8 +51,10 @@ def analyseData(data):
 	count2 = 0
 	count3 = 0
 	count4 = 0
-	for ([computerBlur, computerLookingForward, computerPostureArea, computerOcclusion], [humanFace, humanMovement, humanPoseAngle, humanPostureLR, humanOcclusion, humanEyeAngle]) in data:
+	faces = 0
+	for ([computerBlur, computerLookingForward, computerPostureArea, computerOcclusion], [humanFace, humanMovement, humanPoseAngle, humanPostureLR, humanOcclusion, humanEyeAngle], face) in data:
 		if humanFace == 1:
+			""" posture
 			if computerPostureArea is not None:		
 				if computerPostureArea == humanPostureLR:
 					count1 += 1
@@ -58,6 +62,7 @@ def analyseData(data):
 					count2 += 1
 			else:
 				count3 += 1
+			"""
 			""" occlusion
 			if computerOcclusion != -1:
 				if computerOcclusion == humanOcclusion:
@@ -67,14 +72,16 @@ def analyseData(data):
 			else:
 				count3 += 1
 			"""
-			""" pose
 			if computerLookingForward == 1 and humanPoseAngle == 5:
 				count1 += 1
 			else:
 				count2 += 1
-			"""
+			(x,y,w,h) = face
+			faces += w*h
 		else:
 			count4 += 1
+
+	print(math.sqrt(faces/(totalDetections-count4)))
 
 	print('Count1: ' + str(count1))
 	print('Count2: ' + str(count2))
