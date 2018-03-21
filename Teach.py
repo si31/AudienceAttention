@@ -39,19 +39,34 @@ def collateData():
 					label = person.labels[0]
 					labelData = [label.humanFace, label.humanMovement, label.humanPoseAngle, label.humanPostureLR, label.humanOcclusion, label.humanEyeAngle]
 					data.append((person.data, labelData))
-	print(data)
 	return data
 
 
 def analyseData(data):
 	# currently doing face detection accuracy
 	totalDetections = len(data)
-	incorrect = 0
+	count1 = 0
+	count2 = 0
+	count3 = 0
+	count4 = 0
 	for ([computerBlur, computerLookingForward, computerPostureLR, computerOcclusion], [humanFace, humanMovement, humanPoseAngle, humanPostureLR, humanOcclusion, humanEyeAngle]) in data:
-		if humanFace == 0:
-			incorrect += 1
+		if humanFace != 0:
+			if computerOcclusion != -1:
+				if humanOcclusion == 1:
+					if computerOcclusion == 1:
+						count1 += 1
+					else:
+						count2 += 1
+				else:
+					if computerOcclusion != 1:
+						count3 += 1
+					else:
+						count4 += 1
 
-	print('Incorrect: ' + str(incorrect))
+	print('Count1: ' + str(count1))
+	print('Count2: ' + str(count2))
+	print('Count3: ' + str(count3))
+	print('Count4: ' + str(count4))
 	print('Total: ' + str(totalDetections))
 
 
