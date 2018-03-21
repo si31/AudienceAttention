@@ -102,7 +102,6 @@ class PersonOPPoints:
 		side = (math.fabs(xOfFace-xOfBody) > maxDistance)
 		if xOfFace == 0 or xOfBody == 0:
 			side = False
-			print('ahh')
 		leftLower = (self.leftSideOfHead[1] - self.leftEye[1] < maxDistance/2)
 		if self.leftSideOfHead[1] == 0 or self.leftEye[1] == 0:
 			leftLower = False
