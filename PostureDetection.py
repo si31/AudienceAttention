@@ -96,12 +96,13 @@ class PersonOPPoints:
 		return (int(x2),int(y2),int(w2),int(h2))
 
 	def calcHeadPose(self):
-		maxDistance = self.face[2]/4
+		maxDistance = self.face[2]/8
 		xOfBody = self.centreBody[0]
 		xOfFace = self.centreFace[0]
 		side = (math.fabs(xOfFace-xOfBody) > maxDistance)
 		if xOfFace == 0 or xOfBody == 0:
 			side = False
+			print('ahh')
 		leftLower = (self.leftSideOfHead[1] - self.leftEye[1] < maxDistance/2)
 		if self.leftSideOfHead[1] == 0 or self.leftEye[1] == 0:
 			leftLower = False
@@ -109,7 +110,7 @@ class PersonOPPoints:
 		if self.rightSideOfHead[1] == 0 or self.leftEye[1] == 0:
 			rightLower = False
 		faceToBody = HelperFunctions.calcDistance(self.centreFace[0:2], self.centreBody[0:2])
-		if side or faceToBody < maxDistance*1.75:#leftLower or rightLower:
+		if side or faceToBody < maxDistance*3.5:#leftLower or rightLower:
 			return 0
 		else:
 			return 1
@@ -120,7 +121,7 @@ def associatePersons(personsA, personsB):
 	global imgGLO
 	associations = []
 	for personB in personsB:
-		if personB.face != [0,0,0,0]:
+		if personB.face != [0,0,0,0] and personB.face[-2:] != [0,0]:
 			found = False
 			for personA in personsA:
 				if HelperFunctions.bbOverLapRatio(personA.face, personB.face) > 0.1:
@@ -131,7 +132,6 @@ def associatePersons(personsA, personsB):
 			if not found:
 				newPerson = Person(imgGLO.image, personB.face, None)
 				ComputerVision.faceLandmarks(newPerson, mark=False)
-				#HeadDirection.getPose(newPerson, imgGLO.image.shape, mark=False) # can get rid of as will overwrite it
 				newPerson.blur = ComputerVision.blur(newPerson.image)
 				imgGLO.persons.append(newPerson)
 				newPerson.poseDistance = 1000

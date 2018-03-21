@@ -53,8 +53,8 @@ def detectFeatures(img):
 	print('Detecting occlusion, posture...')
 	ComputerVision.findEars(img, mark=False)
 	PostureDetection.getPosture(img)
-	ComputerVision.finalMerge(img)
 	FaceDetection.removeUnlikelyFacesFinal(img.persons, 0.25, 2.25)
+	ComputerVision.finalMerge(img)
 	#ComputerVision.findMovement(img)
 
 

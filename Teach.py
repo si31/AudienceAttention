@@ -1,3 +1,4 @@
+import os
 import sys
 import cv2
 import numpy as np
@@ -6,8 +7,6 @@ from Image import Image
 import HelperFunctions
 
 listOfGoodComparisonsForHeadPose = [(4,1), (1,2), (2,3), (3,6), (6,9), (9,8), (8,7), (7,4)]
-C=2.67
-GAMMA=5.383
 
 def compareLabels():
 	img = HelperFunctions.readFromDatabase(sys.argv[1])
@@ -29,43 +28,35 @@ def compareLabels():
 	print(poseAreaAccuracy / len(comparisons))
 	print(baseAccuracy / len(comparisons))
 
-
-def SVMHeadPose():
-	img = HelperFunctions.readFromDatabase(sys.argv[1])
-	trainData = []
-	labels = []
-	for person in img.persons:
-		if person.labels[0].humanFace:
-			trainData.append(person.poseParameters)
-			labels.append(1 if person.labels[0].humanPoseAngle == 5 else -1)
-	length = len(labels)
-	svm = svmTrain(trainData[0:int(length*0.75)], labels[0:int(length*0.75)])
-	print(svmTest(svm, trainData[int(length*0.75):length]))
-	print(labels[int(length*0.75):length])
-
-
-def svmTrain(trainData, labels):
-	trainData = np.float32(trainData)#.reshape(-1,64)
-	labels = np.array(labels)
-	svm = cv2.ml.SVM_create()
-	svm.setType(cv2.ml.SVM_C_SVC)
-	svm.setKernel(cv2.ml.SVM_RBF)
-	svm.setC(C)
-	svm.setGamma(GAMMA)
-	assert(len(trainData) == len(labels))
-	svm.train(trainData, cv2.ml.ROW_SAMPLE, labels)
-	svm.save('svm_data.dat')
-	return svm
+def collateData():
+	data = []
+	for file in os.listdir("Database/"):
+		if 'jpg.txt' in file:
+			img = HelperFunctions.readFromDatabase(file[:-4])
+			for person in img.persons:
+				accumulateData(person)
+				if person.labels != []:
+					label = person.labels[0]
+					labelData = [label.humanFace, label.humanMovement, label.humanPoseAngle, label.humanPostureLR, label.humanOcclusion, label.humanEyeAngle]
+					data.append((person.data, labelData))
+	print(data)
+	return data
 
 
-def svmTest(svm, testData):
-	test = np.float32(testData)#.reshape(-1,64)
-	result = svm.predict(test)
-	return result
+def analyseData(data):
+	# currently doing face detection accuracy
+	totalDetections = len(data)
+	incorrect = 0
+	for ([computerBlur, computerLookingForward, computerPostureLR, computerOcclusion], [humanFace, humanMovement, humanPoseAngle, humanPostureLR, humanOcclusion, humanEyeAngle]) in data:
+		if humanFace == 0:
+			incorrect += 1
+
+	print('Incorrect: ' + str(incorrect))
+	print('Total: ' + str(totalDetections))
+
 
 def main():
-	#SVMHeadPose()
-	compareLabels()
+	analyseData(collateData())
 
 if __name__ == "__main__":
 	main()
