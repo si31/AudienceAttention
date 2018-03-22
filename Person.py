@@ -82,7 +82,7 @@ def accumulateData(person):
 		else:
 			person.lookingForward = 1
 	if person.postureLR == -1.0:
-		person.postureArea = None
+		person.postureArea = 1
 	elif person.postureLR < -0.10:
 		person.postureArea = 2
 	elif person.postureLR > 0.10:

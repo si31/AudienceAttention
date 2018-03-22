@@ -44,6 +44,22 @@ def collateData():
 	return data
 
 
+def collateDataML():
+	data = []
+	labels = []
+	for file in os.listdir("Database/"):
+		if 'jpg.txt' in file:
+			img = HelperFunctions.readFromDatabase(file[:-4])
+			for person in img.persons:
+				accumulateData(person)
+				if person.labels != []:
+					label = person.labels[0]
+					if label.humanFace == 1:
+						data.append(person.data[1:])
+						labels.append(label.humanAttention)
+	return data, labels
+
+
 def analyseData(data):
 	# currently doing face detection accuracy
 	totalDetections = len(data)
@@ -90,8 +106,55 @@ def analyseData(data):
 	print('Total: ' + str(totalDetections))
 
 
+SZ = 20
+C=2.67
+GAMMA=5.383
+
+
+def svmTrain(trainData, labels):
+	trainData = np.float32(trainData)
+	labels = np.array(labels)
+	svm = cv2.ml.SVM_create()
+	svm.setType(cv2.ml.SVM_C_SVC)
+	# Set SVM Kernel to Radial Basis Function (RBF) 
+	svm.setKernel(cv2.ml.SVM_RBF)
+	# Set parameter C
+	svm.setC(C)
+	# Set parameter Gamma
+	svm.setGamma(GAMMA)
+	assert(len(trainData) == len(labels))
+	svm.train(trainData, cv2.ml.ROW_SAMPLE, labels)
+	svm.save('svm_data.dat')
+	return svm
+
+
+def svmTest(svm, testData):
+	testData = np.float32(testData)
+	result = svm.predict(testData)
+	return result
+
+
 def main():
-	analyseData(collateData())
+	#analyseData(collateData())
+	data, labels = collateDataML()
+	labels = [1 if label == 1 else -1 for label in labels]
+	trainData = data[0:(len(data)*7)//8]
+	testData = data[(len(data)*7)//8:]
+	trainLabels = labels[0:(len(data)*7)//8]
+	testLabels = labels[(len(data)*7)//8:]	
+	svm = svmTrain(trainData, trainLabels)
+	result = svmTest(svm, testData)
+	result = result[1].tolist()
+	theSame = 0
+	for i in range(len(testLabels)):
+		print((testData[i], testLabels[i], result[i]))
+		if testLabels[i] == int(result[i][0]):
+			theSame += 1
+
+	print(theSame)
+	print(len(testLabels))
+	print(str(theSame/len(testLabels)))
+
 
 if __name__ == "__main__":
 	main()
