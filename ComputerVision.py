@@ -34,7 +34,7 @@ def applyFilter(img, filterArray):
 		for y in range(0,img.shape[1]):
 			w = filterArray.shape[0]
 			h = filterArray.shape[1]
-			total = 0
+			total = 0.0
 			for fx in range(0,w):
 				for fy in range(0,h):
 					xOffset = x+(fx-(w//2))
@@ -79,10 +79,14 @@ def findMovement(img):
 
 
 def blur(image):
-	lapacian = np.array([[0,1,0],[1,-4,1],[0,1,0]])
+	image = cv2.resize(image, (100,100), interpolation=cv2.INTER_LINEAR);
+	lapacian = np.array([[1,1,1],[1,-8,1],[1,1,1]])
 	gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 	filtered = applyFilter(gray, lapacian)
+	cv2.imshow('img',filtered)
+	cv2.waitKey(0)
 	sd = varianceTwoImagesSingleChannel(gray, filtered)
+	print(sd/(image.shape[0]*image.shape[1]))
 	return sd
 
 
@@ -154,8 +158,21 @@ def readFromDatabase(imgName):
 
 
 def main():
-	blur(readFromDatabase('ArmTest/arm1').image)
-
+	image = cv2.imread('imgsInDatabase/me1.png')
+	sd = blur(image)
+	print(sd)
+	print('--')
+	image = cv2.imread('imgsInDatabase/me2.png')
+	sd = blur(image)
+	print(sd)
+	print('--')
+	image = cv2.imread('imgsInDatabase/me3.png')
+	sd = blur(image)
+	print(sd)
+	print('--')
+	image = cv2.imread('imgsInDatabase/me4.png')
+	sd = blur(image)
+	print(sd)
 
 if __name__ == "__main__":
 	main()

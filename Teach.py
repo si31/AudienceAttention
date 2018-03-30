@@ -3,6 +3,7 @@ import sys
 import cv2
 import numpy as np
 import math
+from sklearn import svm as skSVM
 
 from Person import Person, accumulateData, printData
 from Image import Image
@@ -38,8 +39,18 @@ def collateData():
 			for person in img.persons:
 				accumulateData(person)
 				if person.labels != []:
-					label = person.labels[0]
-					labelData = [label.humanFace, label.humanMovement, label.humanPoseAngle, label.humanPostureLR, label.humanOcclusion, label.humanEyeAngle]
+					firstLabel = person.labels[0]
+					if firstLabel.humanFace == 0:
+						labelData = [0, 0, 0, 0, 0, 0, 0]
+					else:
+						attention = 0
+						for label in person.labels[1:]:
+							attention += label.humanAttention
+						divValue = len(person.labels[1:]) if len(person.labels[1:]) >= 1 else 1
+						attention = attention / divValue
+						labelData = [1, firstLabel.humanMovement, firstLabel.humanPoseAngle, firstLabel.humanPostureLR, 
+									firstLabel.humanOcclusion, firstLabel.humanEyeAngle, attention]
+
 					data.append((person.data, labelData, person.face))
 	return data
 
@@ -68,7 +79,7 @@ def analyseData(data):
 	count3 = 0
 	count4 = 0
 	faces = 0
-	for ([computerBlur, computerLookingForward, computerPostureArea, computerOcclusion], [humanFace, humanMovement, humanPoseAngle, humanPostureLR, humanOcclusion, humanEyeAngle], face) in data:
+	for ([computerBlur, computerLookingForward, computerPostureArea, computerOcclusion], [humanFace, humanMovement, humanPoseAngle, humanPostureLR, humanOcclusion, humanEyeAngle, humanAttention], face) in data:
 		if humanFace == 1:
 			""" posture
 			if computerPostureArea is not None:		
@@ -88,10 +99,14 @@ def analyseData(data):
 			else:
 				count3 += 1
 			"""
+			"""
 			if computerLookingForward == 1 and humanPoseAngle == 5:
 				count1 += 1
 			else:
 				count2 += 1
+			"""
+			if humanAttention == 1:
+				count1 += 1
 			(x,y,w,h) = face
 			faces += w*h
 		else:
@@ -111,7 +126,7 @@ C=2.67
 GAMMA=5.383
 
 
-def svmTrain(trainData, labels):
+def svmTrainCV(trainData, labels):
 	trainData = np.float32(trainData)
 	labels = np.array(labels)
 	svm = cv2.ml.SVM_create()
@@ -128,33 +143,50 @@ def svmTrain(trainData, labels):
 	return svm
 
 
-def svmTest(svm, testData):
+def svmTestCV(svm, testData):
 	testData = np.float32(testData)
 	result = svm.predict(testData)
 	return result
 
 
+def svmTrainSK(trainData, labels):
+	trainData = np.float32(trainData)
+	labels = np.float32(labels)
+	classifier = skSVM.SVC(gamma=0.001, C=100.)
+	classifier.fit(trainData, labels)  
+	return classifier
+
+
+def svmTestSK(classifier, testData):
+	testData = np.float32(testData)
+	result = classifier.predict(testData)
+	return result
+
+
 def main():
-	#analyseData(collateData())
+	analyseData(collateData())
+	"""
 	data, labels = collateDataML()
 	labels = [1 if label == 1 else -1 for label in labels]
 	trainData = data[0:(len(data)*7)//8]
 	testData = data[(len(data)*7)//8:]
 	trainLabels = labels[0:(len(data)*7)//8]
 	testLabels = labels[(len(data)*7)//8:]	
-	svm = svmTrain(trainData, trainLabels)
-	result = svmTest(svm, testData)
-	result = result[1].tolist()
+	classifier = svmTrainSK(trainData, trainLabels)
+	result = svmTestSK(classifier, testData)
+	print(classifier.get_params())
+	print(result)
+	result = result.tolist()
 	theSame = 0
 	for i in range(len(testLabels)):
 		print((testData[i], testLabels[i], result[i]))
-		if testLabels[i] == int(result[i][0]):
+		if testLabels[i] == int(result[i]):
 			theSame += 1
 
 	print(theSame)
 	print(len(testLabels))
 	print(str(theSame/len(testLabels)))
-
+	"""
 
 if __name__ == "__main__":
 	main()

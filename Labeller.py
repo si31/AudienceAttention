@@ -39,8 +39,18 @@ def createGUI():
 
 def runImage():
 
-	global img, phase
+	global img, phase, index
 	person = img.persons[index]
+
+	if len(person.labels) != 0:
+		myLabel = person.labels[0]
+		if myLabel.humanFace == 0:
+			index += 1
+			phase = 1
+			if index > len(img.persons)-1:
+				exit()
+			runImage()
+			return
 
 	accumulateData(person)
 	printData(person)
@@ -67,9 +77,13 @@ def runImage():
 		elementsToPack = [b1, b0]
 	elif phase == 1:
 		#buttons to select attention
-		b1 = tk.Button(text="Shows attention", command=lambda: nextImage(1))
-		b0 = tk.Button(text="Does not show attention", command=lambda: nextImage(0))
-		elementsToPack = [b1, b0]
+		l0 = tk.Label(text="This person is paying attention.")
+		b0 = tk.Button(text="Strongly agree", command=lambda: nextImage(2))
+		b1 = tk.Button(text="Agree", command=lambda: nextImage(1))
+		b2 = tk.Button(text="Neither agree nor disagree", command=lambda: nextImage(0))
+		b3 = tk.Button(text="Disagree", command=lambda: nextImage(-1))
+		b4 = tk.Button(text="Strongly disagree", command=lambda: nextImage(-2))
+		elementsToPack = [l0, b0, b1, b2, b3, b4]
 	elif phase == 2:
 		#buttons to select headpose angle
 		bUL = tk.Button(text="upper left", command=lambda: nextImage(1))
@@ -128,16 +142,19 @@ def getLabelObject(person):
 
 
 def nextImage(val):
-	MAX_PHASE = 6
+	MAX_PHASE = 1
 	global img, phase, labelsForPerson, index, root, objToSave
 	person = img.persons[index]
+	print(index)
 	if phase == 0:
 		labelsForPerson = getLabelObject(person)
 		labelsForPerson.humanFace = val
 		if val == 0:
 			phase = MAX_PHASE
 	elif phase == 1:
+		labelsForPerson = getLabelObject(person)
 		labelsForPerson.humanAttention = val
+		print('run')
 	elif phase == 2:
 		labelsForPerson.humanPoseAngle = val
 	elif phase == 3:
@@ -151,22 +168,23 @@ def nextImage(val):
 	if phase == MAX_PHASE:
 		index += 1
 		#labelsForPerson.data = [labelsForPerson.humanEyeAngle, labelsForPerson.humanMovement, labelsForPerson.humanOcclusion, labelsForPerson.humanPostureLR]
+		print(img.persons[0].labels)
 		HelperFunctions.saveToDatabase(objToSave, sys.argv[1])
 		if index > len(img.persons)-1:
 			exit()
-		phase = 0
+		phase = 1
 	else:
 		phase += 1
 	root.destroy()
 	root = tk.Tk()
 	root.title("Audience Attention Labeller")
-	root.geometry('700x700+300+300')
+	root.geometry('1500x800+100+100')
 	runImage() 
 
 
 img = None
 index = 0
-phase = 0
+phase = 1
 labelsForPerson = None
 labelIdentifier = ""
 objToSave = None
