@@ -35,8 +35,8 @@ def createLinearRegressionModel(x,y, plot=False):
 
 		plt.show()
 
-def createGraph(xData, yData, title, xTitle, yTitle):
-	plt.scatter(xData, yData, alpha=0.5)
+def createGraph(xData, yData, title, xTitle, yTitle, labels=None):
+	plt.scatter(xData, yData, alpha=0.5, c=labels)
 	#plt.plot(x,y, alpha = 0.5, color='black')
 	plt.title(title)
 	plt.xlabel(xTitle)

@@ -8,8 +8,11 @@ from sklearn import svm as skSVM
 from Person import Person, accumulateData, printData
 from Image import Image
 import HelperFunctions
+import GraphCreator
+
 
 listOfGoodComparisonsForHeadPose = [(4,1), (1,2), (2,3), (3,6), (6,9), (9,8), (8,7), (7,4)]
+
 
 def compareLabels():
 	img = HelperFunctions.readFromDatabase(sys.argv[1])
@@ -30,6 +33,7 @@ def compareLabels():
 			baseAccuracy += 1
 	print(poseAreaAccuracy / len(comparisons))
 	print(baseAccuracy / len(comparisons))
+
 
 def collateData():
 	data = []
@@ -74,51 +78,65 @@ def collateDataML():
 def analyseData(data):
 	# currently doing face detection accuracy
 	totalDetections = len(data)
-	count1 = 0
-	count2 = 0
-	count3 = 0
+	postureCorrect = 0
+	postureIncorrect = 0
+	postureOcclusionNA = 0
 	count4 = 0
+	occlusionCorrect = 0
+	occlusionIncorrect = 0
+	poseCorrect = 0
+	poseIncorrect = 0
 	faces = 0
-	for ([computerBlur, computerLookingForward, computerPostureArea, computerOcclusion], [humanFace, humanMovement, humanPoseAngle, humanPostureLR, humanOcclusion, humanEyeAngle, humanAttention], face) in data:
+	i=0
+	poseValues = [[],[],[]]
+	blurValues = [[],[]]
+	for ([computerBlur, computerLookingForward, computerPostureArea, computerOcclusion, poseAngle, poseDistance, blur], [humanFace, humanMovement, humanPoseAngle, humanPostureLR, humanOcclusion, humanEyeAngle, humanAttention], face) in data:
 		if humanFace == 1:
-			""" posture
 			if computerPostureArea is not None:		
 				if computerPostureArea == humanPostureLR:
-					count1 += 1
+					postureCorrect += 1
 				else:
-					count2 += 1
+					postureIncorrect += 1
 			else:
-				count3 += 1
-			"""
-			""" occlusion
+				postureOcclusionNA += 1
 			if computerOcclusion != -1:
 				if computerOcclusion == humanOcclusion:
-					count1 += 1
+					occlusionCorrect += 1
 				else:
-					count2 += 1
-			else:
-				count3 += 1
-			"""
-			"""
+					occlusionIncorrect += 1
 			if computerLookingForward == 1 and humanPoseAngle == 5:
-				count1 += 1
+				poseCorrect += 1
 			else:
-				count2 += 1
-			"""
+				poseIncorrect += 1
 			if humanAttention == 1:
-				count1 += 1
+				count4 += 1
 			(x,y,w,h) = face
 			faces += w*h
+			i+=1
+			poseValues[0].append(i)
+			poseValues[1].append(poseDistance)
+			poseValues[2].append((humanPoseAngle == 5))
+			blurValues[0].append((blur*10000)/(w*h))
+			print(blur)
+			blurValues[1].append(humanMovement)
+			print('a')
 		else:
 			count4 += 1
 
-	print(math.sqrt(faces/(totalDetections-count4)))
+	#print(math.sqrt(faces/(totalDetections-count4)))
 
-	print('Count1: ' + str(count1))
-	print('Count2: ' + str(count2))
-	print('Count3: ' + str(count3))
-	print('Count4: ' + str(count4))
+	print('postureCorrect: ' + str(postureCorrect))
+	print('postureIncorrect: ' + str(postureIncorrect))
+	print('occlusionCorrect: ' + str(occlusionCorrect))
+	print('postureIncorrect: ' + str(postureIncorrect))
+	print('occlusionIncorrect: ' + str(occlusionIncorrect))
+	print('poseCorrect: ' + str(poseCorrect))
+	print('poseIncorrect: ' + str(poseIncorrect))
+	print('False Negatives: ' + str(count4))
 	print('Total: ' + str(totalDetections))
+	GraphCreator.createGraph(poseValues[0], blurValues[0], '', '', '', labels=blurValues[1])
+
+	return [postureCorrect, postureIncorrect, occlusionCorrect, occlusionIncorrect, postureOcclusionNA, poseCorrect, poseIncorrect]
 
 
 SZ = 20
@@ -161,6 +179,10 @@ def svmTestSK(classifier, testData):
 	testData = np.float32(testData)
 	result = classifier.predict(testData)
 	return result
+
+
+def headAngle():
+	collateData()
 
 
 def main():

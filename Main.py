@@ -16,6 +16,7 @@ import PostureDetection
 import HelperFunctions
 import HAAR
 import GraphCreator
+import Teach
 
 from Person import Person, accumulateData, printData
 from Image import Image
@@ -77,6 +78,7 @@ def handleImage(imgName, imgFile):
 		else:
 			if HelperFunctions.inDatabase(imgName) and sys.argv[2] == '1':
 				img = HelperFunctions.readFromDatabase(imgName)
+				affect(img)
 			else:
 				img = Image(imgFile)
 				FaceDetection.findFaces(img, mark=False)
@@ -93,6 +95,16 @@ USER_INPUT = None
 root = None
 imgGLO = None
 videoGLO = None
+
+
+def affect(img):
+	image = img.image
+	k = 0
+	for x in range(image.shape[0]):
+		for y in range(image.shape[1]):
+			image[x][y] = np.array([x+k if k+x < 256 else 255 for x in image[x][y].tolist()])
+	cv2.imshow('img', img.image)
+	cv2.waitKey(0)
 
 
 def displayInterface(img, video=False):
@@ -168,7 +180,10 @@ def handleImageFile(imgName):
 
 	img = handleImage(imgName, imgFile)
 
-	if sys.argv[3] == '1':
+	global evalValue
+	evalValue = Teach.main()
+
+	if sys.argv[3] == '1' and False:
 		HelperFunctions.saveToDatabase(img, imgName)
 
 	if sys.argv[4] == '1':
@@ -239,5 +254,19 @@ def main():
 	print('End')
 
 
+evalValue = []
+
+
+def autoMain():
+	fileNames = ['img1.jpg', 'img2.jpg', 'img3.jpg', 'img4a.jpg', 'img4b.jpg',
+				'img4c.jpg', 'img6.jpg','img7.jpg', 'img8.jpg', 'img9a.jpg',
+				'img9b.jpg', 'img9c.jpg', 'img10.jpg']
+	global evalValue
+	for fileName in fileNames:
+		handleImageFile(fileName)
+		[postureCorrect, postureIncorrect, occlusionCorrect, occlusionIncorrect, postureOcclusionNA, poseCorrect, poseIncorrect] = evalValue
+		print(evalValue)
+
+
 if __name__ == "__main__":
-	main()
+	autoMain()

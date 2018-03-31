@@ -29,7 +29,7 @@ def showFaceImages(img, persons):
 
 
 def applyFilter(img, filterArray):
-	newImage = np.zeros(img.shape)
+	newImage = img.copy()
 	for x in range(0,img.shape[0]):
 		for y in range(0,img.shape[1]):
 			w = filterArray.shape[0]
@@ -38,24 +38,32 @@ def applyFilter(img, filterArray):
 			for fx in range(0,w):
 				for fy in range(0,h):
 					xOffset = x+(fx-(w//2))
-					yOffset = y+(fy-(h//2)) #floor division
+					yOffset = y+(fy-(h//2))
 					if xOffset >= 0 and xOffset < img.shape[0] and yOffset >= 0 and yOffset < img.shape[1]:
 						total += filterArray[fx][fy] * img[xOffset][yOffset]
-			newImage[x][y] = total
+			total = total if total < 256 else 255
+			newImage[x][y] = total if total >= 0 else 0
 	return newImage
 
 
-def varianceTwoImagesSingleChannel(img1, img2):
+def varianceTwoImagesSingleChannel(img1):
 	totalSquares = 0
 	total = 0
+	overallTotal = 0
+	overallTotalSquares = 0
+	for x in range(img1.shape[0]):
+		for y in range(img1.shape[1]):
+			total += (img1[x][y])
+		overallTotal += total / (img1.shape[0] * img1.shape[1])
+		total = 0
+	mean = overallTotal
 	for x in range(0,img1.shape[0]):
 		for y in range(0,img1.shape[1]):
-			totalSquares += math.pow((img1[x][y] - img2[x][y]),2)
-			total += (img1[x][y] - img2[x][y])
-	squaresAverage = totalSquares / (img1.shape[0] + img1.shape[1])
-	average = total / (img1.shape[0] + img1.shape[1])
-	sd = squaresAverage - math.pow(average,2)
-	return sd
+			totalSquares += math.pow((img1[x][y]) - mean, 2)
+		overallTotalSquares += totalSquares / (img1.shape[0] * img1.shape[1])
+		totalSquares = 0
+	var = overallTotalSquares
+	return var
 
 
 def findMovement(img):
@@ -79,14 +87,11 @@ def findMovement(img):
 
 
 def blur(image):
-	image = cv2.resize(image, (100,100), interpolation=cv2.INTER_LINEAR);
-	lapacian = np.array([[1,1,1],[1,-8,1],[1,1,1]])
+	image = cv2.resize(image, (300,300), interpolation=cv2.INTER_LINEAR);
+	lapacian = np.array([[0,1,0],[1,-4,1],[0,1,0]])
 	gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 	filtered = applyFilter(gray, lapacian)
-	cv2.imshow('img',filtered)
-	cv2.waitKey(0)
-	sd = varianceTwoImagesSingleChannel(gray, filtered)
-	print(sd/(image.shape[0]*image.shape[1]))
+	sd = varianceTwoImagesSingleChannel(filtered)
 	return sd
 
 

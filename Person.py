@@ -90,7 +90,7 @@ def accumulateData(person):
 	else:
 		person.postureArea = 1
 		
-	person.data = [person.blur, person.lookingForward, person.postureArea, person.occlusion]#, person.attention]
+	person.data = [person.blur, person.lookingForward, person.postureArea, person.occlusion, person.poseAngle, person.poseDistance, person.blur]#, person.attention]
 
 
 class LabelsForPerson:
