@@ -3,8 +3,8 @@ import sys
 import cv2
 import numpy as np
 import math
-from sklearn import svm as skSVM
-
+from sklearn import metrics, model_selection, svm as skSVM
+import random
 from Person import Person, accumulateData, printData
 from Image import Image
 import HelperFunctions
@@ -45,15 +45,17 @@ def collateData():
 				if person.labels != []:
 					firstLabel = person.labels[0]
 					if firstLabel.humanFace == 0:
-						labelData = [0, 0, 0, 0, 0, 0, 0]
+						labelData = [0, 0, 0, 0, 0, 0, 0, 1]
 					else:
 						attention = 0
+						i = 0
 						for label in person.labels[1:]:
 							attention += label.humanAttention
+							i += 1
 						divValue = len(person.labels[1:]) if len(person.labels[1:]) >= 1 else 1
 						attention = attention / divValue
 						labelData = [1, firstLabel.humanMovement, firstLabel.humanPoseAngle, firstLabel.humanPostureLR, 
-									firstLabel.humanOcclusion, firstLabel.humanEyeAngle, attention]
+									firstLabel.humanOcclusion, firstLabel.humanEyeAngle, attention, i]
 
 					data.append((person.data, labelData, person.face))
 	return data
@@ -70,8 +72,13 @@ def collateDataML():
 				if person.labels != []:
 					label = person.labels[0]
 					if label.humanFace == 1:
-						data.append(person.data[1:])
-						labels.append(label.humanAttention)
+						attention = 0.0
+						for label in person.labels[1:]:
+							attention += label.humanAttention
+						divValue = len(person.labels[1:]) if len(person.labels[1:]) >= 1 else 1
+						attention = attention / divValue
+						data.append(person.data[1:4])
+						labels.append(attention)
 	return data, labels
 
 
@@ -90,7 +97,7 @@ def analyseData(data):
 	i=0
 	poseValues = [[],[],[]]
 	blurValues = [[],[]]
-	for ([computerBlur, computerLookingForward, computerPostureArea, computerOcclusion, poseAngle, poseDistance, blur], [humanFace, humanMovement, humanPoseAngle, humanPostureLR, humanOcclusion, humanEyeAngle, humanAttention], face) in data:
+	for ([computerBlur, computerLookingForward, computerPostureArea, computerOcclusion, poseAngle, poseDistance, blur], [humanFace, humanMovement, humanPoseAngle, humanPostureLR, humanOcclusion, humanEyeAngle, humanAttention, noLabels], face) in data:
 		if humanFace == 1:
 			if computerPostureArea is not None:		
 				if computerPostureArea == humanPostureLR:
@@ -108,18 +115,15 @@ def analyseData(data):
 				poseCorrect += 1
 			else:
 				poseIncorrect += 1
-			if humanAttention == 1:
-				count4 += 1
 			(x,y,w,h) = face
 			faces += w*h
 			i+=1
+			print(noLabels)
 			poseValues[0].append(i)
 			poseValues[1].append(poseDistance)
 			poseValues[2].append((humanPoseAngle == 5))
 			blurValues[0].append((blur*10000)/(w*h))
-			print(blur)
 			blurValues[1].append(humanMovement)
-			print('a')
 		else:
 			count4 += 1
 
@@ -134,9 +138,9 @@ def analyseData(data):
 	print('poseIncorrect: ' + str(poseIncorrect))
 	print('False Negatives: ' + str(count4))
 	print('Total: ' + str(totalDetections))
-	GraphCreator.createGraph(poseValues[0], blurValues[0], '', '', '', labels=blurValues[1])
+	#GraphCreator.createGraph(poseValues[0], blurValues[0], '', '', '', labels=blurValues[1])
 
-	return [postureCorrect, postureIncorrect, occlusionCorrect, occlusionIncorrect, postureOcclusionNA, poseCorrect, poseIncorrect]
+	return [postureCorrect, postureIncorrect, occlusionCorrect, occlusionIncorrect, postureOcclusionNA, poseCorrect, poseIncorrect, totalDetections-count4]
 
 
 SZ = 20
@@ -167,10 +171,14 @@ def svmTestCV(svm, testData):
 	return result
 
 
-def svmTrainSK(trainData, labels):
+def svmTrainSK(trainData, labels, classification=True):
 	trainData = np.float32(trainData)
 	labels = np.float32(labels)
-	classifier = skSVM.SVC(gamma=0.001, C=100.)
+	classifier = None
+	if classification:
+		classifier = skSVM.SVC(gamma=0.001, C=100.)
+	else:
+		classifier = skSVM.SVR()
 	classifier.fit(trainData, labels)  
 	return classifier
 
@@ -185,15 +193,13 @@ def headAngle():
 	collateData()
 
 
-def main():
-	analyseData(collateData())
-	"""
-	data, labels = collateDataML()
-	labels = [1 if label == 1 else -1 for label in labels]
-	trainData = data[0:(len(data)*7)//8]
-	testData = data[(len(data)*7)//8:]
-	trainLabels = labels[0:(len(data)*7)//8]
-	testLabels = labels[(len(data)*7)//8:]	
+def MLClassification(data, labels, zipped):
+	data, labels = zip(*zipped)
+	labels = [1 if label >= 0 else -1 for label in labels]
+	trainData = data[0:(len(data)*3)//4]
+	testData = data[(len(data)*3)//4:]
+	trainLabels = labels[0:(len(data)*3)//4]
+	testLabels = labels[(len(data)*3)//4:]
 	classifier = svmTrainSK(trainData, trainLabels)
 	result = svmTestSK(classifier, testData)
 	print(classifier.get_params())
@@ -201,13 +207,115 @@ def main():
 	result = result.tolist()
 	theSame = 0
 	for i in range(len(testLabels)):
-		print((testData[i], testLabels[i], result[i]))
 		if testLabels[i] == int(result[i]):
 			theSame += 1
 
 	print(theSame)
 	print(len(testLabels))
 	print(str(theSame/len(testLabels)))
+	print(' ')
+	MLClassificationEval(data, labels)
+	print(metrics.confusion_matrix(testLabels, result))
+
+
+def MLRegression(data, labels, zipped):
+	data, labels = zip(*zipped)
+	labels = [a+2 for a in labels]
+	trainData = data[0:(len(data)*3)//4]
+	testData = data[(len(data)*3)//4:]
+	trainLabels = labels[0:(len(data)*3)//4]
+	testLabels = labels[(len(data)*3)//4:]
+	classifier = svmTrainSK(trainData, trainLabels, classification=False)
+	result = svmTestSK(classifier, testData)
+	print(result)
+	result = result.tolist()
+	theSame = 0
+	meanDiff = 0.0
+	#change for comparison
+	testLabels = [1 if label >= 2 else 0 for label in testLabels]
+	result = [1 if label >= 2 else 0 for label in result]
+	for i in range(len(testLabels)):
+		meanDiff += math.pow(testLabels[i]-result[i],2)
+		if testLabels[i] == result[i]:
+			theSame += 1
+	print(theSame)
+	print(len(testLabels))
+	meanDiff = meanDiff / len(testLabels)
+
+	MLRegressionEval(data, labels)
+
+
+def MLClassificationEval(data, labels):
+	kfold = model_selection.KFold(n_splits=10, random_state=7)
+	model = skSVM.SVC(gamma=0.001, C=100.)
+	scoring = 'r2'
+	results = model_selection.cross_val_score(model, data, labels, cv=kfold, scoring=scoring)
+	print(results.mean())
+
+
+def MLRegressionEval(data, labels):
+
+	kfold = model_selection.KFold(n_splits=10, random_state=7)
+	scoring = 'neg_mean_absolute_error'
+	model = skSVM.SVR()
+	score = model_selection.cross_val_score(model, data, labels, cv=kfold, scoring=scoring)
+	print(score)
+	print(score.mean())
+	print(score.std())
+
+
+def performKFold(k, data, labels, classification):
+	alltestlabels = []
+	allresultlabels = []
+	if classification:
+		labels = [1 if label >= 0 else -1 for label in labels]
+	else:
+		labels = [a+2 for a in labels]
+	for i in range(k):
+		l = len(data)
+		w = len(data) / k
+		print(w)
+		trainData = data[:int(i*w)] + data[int((i+1)*w):]
+		testData = data[int(i*w):int((i+1)*w)]
+		trainLabels = labels[:int(i*w)] + labels[int((i+1)*w):]
+		testLabels = labels[int(i*w):int((i+1)*w)]
+		classifier = svmTrainSK(trainData, trainLabels, classification=classification)
+		result = svmTestSK(classifier, testData)
+		alltestlabels += testLabels
+		allresultlabels += result.tolist()
+		theSame = 0
+		if not classification:
+			result = [1 if label >= 2 else 0 for label in result.tolist()]
+			testLabels = [1 if label >= 2 else 0 for label in testLabels]	
+		for i in range(len(testLabels)):
+			if result[i] == testLabels[i]:
+				theSame += 1
+		print(theSame)
+	theSame = 0
+	print(allresultlabels)
+	if not classification:
+		allresultlabels = [1 if label >= 2 else 0 for label in allresultlabels]
+		alltestlabels = [1 if label >= 2 else 0 for label in alltestlabels]	
+	for i in range(len(alltestlabels)):
+		if alltestlabels[i] == allresultlabels[i]:
+			theSame += 1
+	print(theSame)
+	print(len(allresultlabels))
+	print(metrics.confusion_matrix(alltestlabels, allresultlabels))
+
+
+
+def main():
+	return analyseData(collateData())
+	"""
+	data, labels = collateDataML()
+	zipped = list(zip(data, labels))
+	random.shuffle(zipped)
+	MLClassification(data, labels, zipped)
+	MLRegression(data, labels, zipped)
+	data, labels = zip(*zipped)
+	#performKFold(4, data, labels, False)
+	#performKFold(4, data, labels, True)
 	"""
 
 if __name__ == "__main__":

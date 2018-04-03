@@ -12,7 +12,7 @@ import FaceDetection
 import ComputerVision
 import MachineLearning
 import HeadDirection
-import PostureDetection
+#import PostureDetection
 import HelperFunctions
 import HAAR
 import GraphCreator
@@ -47,7 +47,7 @@ def showAllPeople(persons):
 def detectFeatures(img):
 	print('Detecting landmarks, head pose, blur...')
 	for person in img.persons:
-		ComputerVision.faceLandmarks(person, mark=True)
+		ComputerVision.faceLandmarks(person, mark=False)
 		HeadDirection.getPose(person, img.image.shape, mark=False)
 		person.blur = ComputerVision.blur(person.image)
 		pass
@@ -103,8 +103,8 @@ def affect(img):
 	for x in range(image.shape[0]):
 		for y in range(image.shape[1]):
 			image[x][y] = np.array([x+k if k+x < 256 else 255 for x in image[x][y].tolist()])
-	cv2.imshow('img', img.image)
-	cv2.waitKey(0)
+	#cv2.imshow('img', img.image)
+	#cv2.waitKey(0)
 
 
 def displayInterface(img, video=False):
@@ -264,7 +264,7 @@ def autoMain():
 	global evalValue
 	for fileName in fileNames:
 		handleImageFile(fileName)
-		[postureCorrect, postureIncorrect, occlusionCorrect, occlusionIncorrect, postureOcclusionNA, poseCorrect, poseIncorrect] = evalValue
+		[postureCorrect, postureIncorrect, occlusionCorrect, occlusionIncorrect, postureOcclusionNA, poseCorrect, poseIncorrect, correctDetections] = evalValue
 		print(evalValue)
 
 
