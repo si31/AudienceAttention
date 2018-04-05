@@ -113,7 +113,7 @@ def findEars(img, mark=False):
 	cascadePaths = []
 	detected = []
 
-	mac = True
+	mac = False
 	if mac:
 		cascadePaths.append('/usr/local/Cellar/opencv/3.3.0_3/share/OpenCV/haarcascades/haarcascade_mcs_rightear.xml')
 		cascadePaths.append('/usr/local/Cellar/opencv/3.3.0_3/share/OpenCV/haarcascades/haarcascade_mcs_leftear.xml')

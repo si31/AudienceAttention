@@ -40,6 +40,7 @@ def collateData():
 	for file in os.listdir("Database/"):
 		if 'jpg.txt' in file:
 			img = HelperFunctions.readFromDatabase(file[:-4])
+			print(len(img.persons))
 			for person in img.persons:
 				accumulateData(person)
 				if person.labels != []:
@@ -97,28 +98,26 @@ def analyseData(data):
 	i=0
 	poseValues = [[],[],[]]
 	blurValues = [[],[]]
-	for ([computerBlur, computerLookingForward, computerPostureArea, computerOcclusion, poseAngle, poseDistance, blur], [humanFace, humanMovement, humanPoseAngle, humanPostureLR, humanOcclusion, humanEyeAngle, humanAttention, noLabels], face) in data:
+	for ([computerBlur, computerLookingForward, computerPostureArea, computerOcclusion, poseAngle, poseDistance, blur, OP], [humanFace, humanMovement, humanPoseAngle, humanPostureLR, humanOcclusion, humanEyeAngle, humanAttention, noLabels], face) in data:
 		if humanFace == 1:
-			if computerPostureArea is not None:		
+			if OP is not None:		
 				if computerPostureArea == humanPostureLR:
 					postureCorrect += 1
 				else:
 					postureIncorrect += 1
-			else:
-				postureOcclusionNA += 1
-			if computerOcclusion != -1:
 				if computerOcclusion == humanOcclusion:
 					occlusionCorrect += 1
 				else:
 					occlusionIncorrect += 1
-			if computerLookingForward == 1 and humanPoseAngle == 5:
+			else:
+				postureOcclusionNA += 1
+			if computerLookingForward == 1 and humanPoseAngle == 5 or computerLookingForward == 0 and humanPoseAngle != 5:
 				poseCorrect += 1
 			else:
 				poseIncorrect += 1
 			(x,y,w,h) = face
 			faces += w*h
 			i+=1
-			print(noLabels)
 			poseValues[0].append(i)
 			poseValues[1].append(poseDistance)
 			poseValues[2].append((humanPoseAngle == 5))
@@ -132,8 +131,8 @@ def analyseData(data):
 	print('postureCorrect: ' + str(postureCorrect))
 	print('postureIncorrect: ' + str(postureIncorrect))
 	print('occlusionCorrect: ' + str(occlusionCorrect))
-	print('postureIncorrect: ' + str(postureIncorrect))
 	print('occlusionIncorrect: ' + str(occlusionIncorrect))
+	print('NA: ' + str(postureOcclusionNA))
 	print('poseCorrect: ' + str(poseCorrect))
 	print('poseIncorrect: ' + str(poseIncorrect))
 	print('False Negatives: ' + str(count4))

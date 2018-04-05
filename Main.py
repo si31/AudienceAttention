@@ -12,7 +12,7 @@ import FaceDetection
 import ComputerVision
 import MachineLearning
 import HeadDirection
-#import PostureDetection
+import PostureDetection
 import HelperFunctions
 import HAAR
 import GraphCreator
@@ -49,10 +49,10 @@ def detectFeatures(img):
 	for person in img.persons:
 		ComputerVision.faceLandmarks(person, mark=False)
 		HeadDirection.getPose(person, img.image.shape, mark=False)
-		person.blur = ComputerVision.blur(person.image)
+		person.blur = 0 #ComputerVision.blur(person.image)
 		pass
 	print('Detecting occlusion, posture...')
-	ComputerVision.findEars(img, mark=False)
+	#ComputerVision.findEars(img, mark=False)
 	PostureDetection.getPosture(img)
 	FaceDetection.removeUnlikelyFacesFinal(img.persons, 0.25, 2.25)
 	ComputerVision.finalMerge(img)
@@ -99,10 +99,10 @@ videoGLO = None
 
 def affect(img):
 	image = img.image
-	k = 0
+	k = -30
 	for x in range(image.shape[0]):
 		for y in range(image.shape[1]):
-			image[x][y] = np.array([x+k if k+x < 256 else 255 for x in image[x][y].tolist()])
+			image[x][y] = np.array([x+k if k+x > 0 else 0 for x in image[x][y].tolist()])
 	#cv2.imshow('img', img.image)
 	#cv2.waitKey(0)
 
@@ -183,7 +183,7 @@ def handleImageFile(imgName):
 	global evalValue
 	evalValue = Teach.main()
 
-	if sys.argv[3] == '1' and False:
+	if sys.argv[3] == '1':
 		HelperFunctions.saveToDatabase(img, imgName)
 
 	if sys.argv[4] == '1':
@@ -264,8 +264,8 @@ def autoMain():
 	global evalValue
 	for fileName in fileNames:
 		handleImageFile(fileName)
-		[postureCorrect, postureIncorrect, occlusionCorrect, occlusionIncorrect, postureOcclusionNA, poseCorrect, poseIncorrect, correctDetections] = evalValue
-		print(evalValue)
+	[postureCorrect, postureIncorrect, occlusionCorrect, occlusionIncorrect, postureOcclusionNA, poseCorrect, poseIncorrect, correctDetections] = evalValue
+	print(evalValue)
 
 
 if __name__ == "__main__":

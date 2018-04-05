@@ -29,6 +29,8 @@ def runOP(img):
 	op.detectHands(img)
 	res = np.copy(img)
 	dataOP = op.getKeypoints(op.KeypointType.POSE)[0]
+	if dataOP is None:
+		return []
 	dataOP = dataOP.tolist()
 	dataOPFace = op.getKeypoints(op.KeypointType.POSE)[0].tolist()[0]
 
@@ -88,11 +90,11 @@ class PersonOPPoints:
 
 	def resizeHand(self, face, hand):
 		(x1,y1,w1,h1) = hand
-		handToFaceSizeRatio = 0.6 
+		handToFaceSizeRatio = 2
 		w2 = face[2]*handToFaceSizeRatio
 		h2 = face[3]*handToFaceSizeRatio
-		x2 = (w1-w2)/2 + x1
-		y2 = (h1-h2)/2 + y1
+		x2 = x1 - (w1-w2)/2
+		y2 = y1 - (h1-h2)/2
 		return (int(x2),int(y2),int(w2),int(h2))
 
 	def calcHeadPose(self):
@@ -113,7 +115,6 @@ class PersonOPPoints:
 			return 0
 		else:
 			return 1
-		#OPHead = (HelperFunctions.calcDistance(self.leftEye[0:2], self.leftSideOfHead[0:2]) < maxDistance and HelperFunctions.calcDistance(self.rightEye[0:2], self.rightSideOfHead[0:2]) < maxDistance)
 
 
 def associatePersons(personsA, personsB):
@@ -142,7 +143,7 @@ def determineHandPositionType(face, leftHand, rightHand):
 	leftOcclusion = HelperFunctions.bbOverLapRatio(face, leftHand) > 0.01
 	rightOcclusion = HelperFunctions.bbOverLapRatio(face, rightHand) > 0.01
 	occlusion = 1 if leftOcclusion or rightOcclusion else 0
-	return (occlusion)
+	return occlusion
 
 
 imgGLO = None
@@ -153,9 +154,11 @@ def getPosture(img):
 	imgGLO = img
 	detectedPersons = img.persons #what has been detected by program so far
 	detectedPersonsOP = runOP(img.image)
+	if detectedPersonsOP == []:
+		return
 	associations = associatePersons(detectedPersons, detectedPersonsOP)
 	for (personA, personB) in associations:
-		(occlusion) = determineHandPositionType(personB.face, personB.leftHandBB, personB.rightHandBB)
+		occlusion = determineHandPositionType(personB.face, personB.leftHandBB, personB.rightHandBB)
 		personA.occlusion = occlusion
 		personA.headPoseOP = True
 		personA.postureLR = shoulderAngle(personB.leftShoulder, personB.rightShoulder)
