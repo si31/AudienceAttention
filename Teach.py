@@ -115,15 +115,9 @@ def analyseData(data):
 	i=0
 	poseValues = [[],[],[]]
 	blurValues = [[],[]]
-<<<<<<< Updated upstream
-	for ([computerBlur, computerLookingForward, computerPostureArea, computerOcclusion, poseAngle, poseDistance, blur, OP], [humanFace, humanMovement, humanPoseAngle, humanPostureLR, humanOcclusion, humanEyeAngle, humanAttention, noLabels], face) in data:
-		if humanFace == 1:
-			if OP is not None:		
-=======
 	for ([computerLookingForward, computerPostureArea, computerOcclusion, poseAngle, poseDistance, postureLR], [humanFace, humanMovement, humanPoseAngle, humanPostureLR, humanOcclusion, humanEyeAngle, humanAttention, noLabels], face) in data:
 		if humanFace == 1:
 			if computerPostureArea != -1:		
->>>>>>> Stashed changes
 				if computerPostureArea == humanPostureLR:
 					postureCorrect += 1
 				else:
@@ -132,27 +126,15 @@ def analyseData(data):
 					occlusionCorrect += 1
 				else:
 					occlusionIncorrect += 1
-<<<<<<< Updated upstream
 			else:
 				postureOcclusionNA += 1
-=======
->>>>>>> Stashed changes
 			if computerLookingForward == 1 and humanPoseAngle == 5 or computerLookingForward == 0 and humanPoseAngle != 5:
 				poseCorrect += 1
 			else:
 				poseIncorrect += 1
 			(x,y,w,h) = face
 			faces += w*h
-<<<<<<< Updated upstream
-			i+=1
-			poseValues[0].append(i)
-			poseValues[1].append(poseDistance)
-			poseValues[2].append((humanPoseAngle == 5))
-			blurValues[0].append((blur*10000)/(w*h))
-			blurValues[1].append(humanMovement)
-=======
 			i += 1
->>>>>>> Stashed changes
 		else:
 			falseDetections += 1
 	print('postureCorrect: ' + str(postureCorrect))
@@ -326,8 +308,6 @@ def main():
 
 	#for training actual model used
 	#svmTrainSK(data, labels, classification=False, save=True)
-
-	
 	
 
 if __name__ == "__main__":
