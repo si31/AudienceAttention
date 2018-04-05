@@ -94,13 +94,8 @@ def accumulateData(person):
 	else:
 		person.postureArea = 1
 		
-<<<<<<< Updated upstream
-	person.data = [person.blur, person.lookingForward, person.postureArea, person.occlusion, person.poseAngle, person.poseDistance, person.blur, person.headPoseOP]#, person.attention]
-	#remove last one
-=======
 	person.data = [person.lookingForward, person.postureArea, person.occlusion, person.poseAngle, person.poseDistance, person.postureLR]#, person.attention]
 
->>>>>>> Stashed changes
 
 class LabelsForPerson:
 
@@ -116,3 +111,4 @@ class LabelsForPerson:
 		self.humanAttention = None # participant estimated human attention
 		#accumulated data
 		self.data = [] #includes the 4 features of movement, eye angle, posture and occlusion
+		
