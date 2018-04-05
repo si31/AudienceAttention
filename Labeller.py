@@ -54,6 +54,10 @@ def runImage():
 
 	accumulateData(person)
 	printData(person)
+	labels = []
+	for label in person.labels[1:]:
+		labels.append(label.humanAttention)
+	print([labels.count(2), labels.count(1), labels.count(0), labels.count(-1), labels.count(-2)])
 	imgToShow = cv2.cvtColor(person.image, cv2.COLOR_BGR2RGB)
 	imgPIL0 = PILIm.fromarray(imgToShow)
 	imgTk0 = ImageTk.PhotoImage(imgPIL0)
@@ -77,12 +81,12 @@ def runImage():
 		elementsToPack = [b1, b0]
 	elif phase == 1:
 		#buttons to select attention
-		l0 = tk.Label(text="This person is paying attention.")
-		b0 = tk.Button(text="Strongly agree", command=lambda: nextImage(2))
-		b1 = tk.Button(text="Agree", command=lambda: nextImage(1))
-		b2 = tk.Button(text="Neither agree nor disagree", command=lambda: nextImage(0))
-		b3 = tk.Button(text="Disagree", command=lambda: nextImage(-1))
-		b4 = tk.Button(text="Strongly disagree", command=lambda: nextImage(-2))
+		l0 = tk.Label(text="How attentive is this person on a scale from 1 to 5?")
+		b0 = tk.Button(text="5", command=lambda: nextImage(2))
+		b1 = tk.Button(text="4", command=lambda: nextImage(1))
+		b2 = tk.Button(text="3", command=lambda: nextImage(0))
+		b3 = tk.Button(text="2", command=lambda: nextImage(-1))
+		b4 = tk.Button(text="1", command=lambda: nextImage(-2))
 		elementsToPack = [l0, b0, b1, b2, b3, b4]
 	elif phase == 2:
 		#buttons to select headpose angle

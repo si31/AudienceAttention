@@ -153,7 +153,7 @@ def annotateImage(image, bb, val1, val2, ratio):
 	boxW = 20
 	boxH = 20
 	cv2.rectangle(image, (x,y), (x+w, y+h), (0,255,0), 3)
-	cv2.rectangle(image, (boxX, boxY), (boxX+boxW, boxY+boxH), (255,255,255), -1)
+	cv2.rectangle(image, (boxX, boxY), (boxX+boxW*2, boxY+boxH), (255,255,255), -1)
 	cv2.putText(image, str(val1), (boxX, boxY+boxH-5), FONT, 0.5, (0,0,0), 1, cv2.LINE_AA)
 	cv2.rectangle(image, (boxX, boxY+boxH+10), (boxX+boxW, boxY+2*boxH+10), (255,255,255), -1)
 	cv2.putText(image, str(val2), (boxX, boxY+2*boxH+5), FONT, 0.5, (0,0,0), 1, cv2.LINE_AA)

@@ -9,30 +9,10 @@ from Person import Person, accumulateData, printData
 from Image import Image
 import HelperFunctions
 import GraphCreator
-
-
-listOfGoodComparisonsForHeadPose = [(4,1), (1,2), (2,3), (3,6), (6,9), (9,8), (8,7), (7,4)]
-
-
-def compareLabels():
-	img = HelperFunctions.readFromDatabase(sys.argv[1])
-	comparisons = []
-	poseAreaAccuracy = 0
-	baseAccuracy = 0
-	for person in img.persons:
-		if person.labels[0].humanFace:
-			accumulateData(person)
-			label = person.labels[0]
-			thisComparison = ([person.lookingForward, person.occlusion, person.postureArea, person.blur, person.earDetected], [label.humanPoseAngle, label.humanOcclusion, label.humanPostureLR, label.humanMovement])
-			comparisons.append(thisComparison)
-	for comparison in comparisons:
-		([a1,b1,c1,d1,e1],[a2,b2,c2,d2]) = comparison
-		if (a1 == 1 and a2 == 5) or (a1 == 0 and a2 != 5):
-			poseAreaAccuracy += 1
-		if a2 == 5:
-			baseAccuracy += 1
-	print(poseAreaAccuracy / len(comparisons))
-	print(baseAccuracy / len(comparisons))
+import krippendorff
+import statistics
+from sklearn.preprocessing import Imputer
+import pickle
 
 
 def collateData():
@@ -62,6 +42,43 @@ def collateData():
 	return data
 
 
+def collateDataKripp():
+	labelSet = []
+	for file in os.listdir("Database/"):
+		if 'jpg.txt' in file:
+			img = HelperFunctions.readFromDatabase(file[:-4])
+			for person in img.persons:
+				accumulateData(person)
+				attentions = []
+				if person.labels != []:
+					label = person.labels[0]
+					if label.humanFace == 1:
+						for label in person.labels[1:]:
+							attentions.append(label.humanAttention)
+				labelSet.append(attentions)
+	return labelSet
+
+def collateDataMLFullArray():
+	labelSet = []
+	data = []
+	for file in os.listdir("Database/"):
+		if 'jpg.txt' in file:
+			img = HelperFunctions.readFromDatabase(file[:-4])
+			for person in img.persons:
+				accumulateData(person)
+				attentions = []
+				if person.labels != []:
+					label = person.labels[0]
+					if label.humanFace == 1:
+						for label in person.labels[1:]:
+							attentions.append(label.humanAttention)
+				if not badData(attentions):# and person.data[1:2] != [-1]:
+					labelSet.append(attentions)
+					data.append(person.data)
+
+	return data, labelSet
+
+
 def collateDataML():
 	data = []
 	labels = []
@@ -89,7 +106,7 @@ def analyseData(data):
 	postureCorrect = 0
 	postureIncorrect = 0
 	postureOcclusionNA = 0
-	count4 = 0
+	falseDetections = 0
 	occlusionCorrect = 0
 	occlusionIncorrect = 0
 	poseCorrect = 0
@@ -98,9 +115,15 @@ def analyseData(data):
 	i=0
 	poseValues = [[],[],[]]
 	blurValues = [[],[]]
+<<<<<<< Updated upstream
 	for ([computerBlur, computerLookingForward, computerPostureArea, computerOcclusion, poseAngle, poseDistance, blur, OP], [humanFace, humanMovement, humanPoseAngle, humanPostureLR, humanOcclusion, humanEyeAngle, humanAttention, noLabels], face) in data:
 		if humanFace == 1:
 			if OP is not None:		
+=======
+	for ([computerLookingForward, computerPostureArea, computerOcclusion, poseAngle, poseDistance, postureLR], [humanFace, humanMovement, humanPoseAngle, humanPostureLR, humanOcclusion, humanEyeAngle, humanAttention, noLabels], face) in data:
+		if humanFace == 1:
+			if computerPostureArea != -1:		
+>>>>>>> Stashed changes
 				if computerPostureArea == humanPostureLR:
 					postureCorrect += 1
 				else:
@@ -109,25 +132,29 @@ def analyseData(data):
 					occlusionCorrect += 1
 				else:
 					occlusionIncorrect += 1
+<<<<<<< Updated upstream
 			else:
 				postureOcclusionNA += 1
+=======
+>>>>>>> Stashed changes
 			if computerLookingForward == 1 and humanPoseAngle == 5 or computerLookingForward == 0 and humanPoseAngle != 5:
 				poseCorrect += 1
 			else:
 				poseIncorrect += 1
 			(x,y,w,h) = face
 			faces += w*h
+<<<<<<< Updated upstream
 			i+=1
 			poseValues[0].append(i)
 			poseValues[1].append(poseDistance)
 			poseValues[2].append((humanPoseAngle == 5))
 			blurValues[0].append((blur*10000)/(w*h))
 			blurValues[1].append(humanMovement)
+=======
+			i += 1
+>>>>>>> Stashed changes
 		else:
-			count4 += 1
-
-	#print(math.sqrt(faces/(totalDetections-count4)))
-
+			falseDetections += 1
 	print('postureCorrect: ' + str(postureCorrect))
 	print('postureIncorrect: ' + str(postureIncorrect))
 	print('occlusionCorrect: ' + str(occlusionCorrect))
@@ -135,50 +162,28 @@ def analyseData(data):
 	print('NA: ' + str(postureOcclusionNA))
 	print('poseCorrect: ' + str(poseCorrect))
 	print('poseIncorrect: ' + str(poseIncorrect))
-	print('False Negatives: ' + str(count4))
+	print('False Negatives: ' + str(falseDetections))
 	print('Total: ' + str(totalDetections))
 	#GraphCreator.createGraph(poseValues[0], blurValues[0], '', '', '', labels=blurValues[1])
-
-	return [postureCorrect, postureIncorrect, occlusionCorrect, occlusionIncorrect, postureOcclusionNA, poseCorrect, poseIncorrect, totalDetections-count4]
-
-
-SZ = 20
-C=2.67
-GAMMA=5.383
+	return [postureCorrect, postureIncorrect, occlusionCorrect, occlusionIncorrect, postureOcclusionNA, poseCorrect, poseIncorrect, totalDetections-falseDetections]
 
 
-def svmTrainCV(trainData, labels):
-	trainData = np.float32(trainData)
-	labels = np.array(labels)
-	svm = cv2.ml.SVM_create()
-	svm.setType(cv2.ml.SVM_C_SVC)
-	# Set SVM Kernel to Radial Basis Function (RBF) 
-	svm.setKernel(cv2.ml.SVM_RBF)
-	# Set parameter C
-	svm.setC(C)
-	# Set parameter Gamma
-	svm.setGamma(GAMMA)
-	assert(len(trainData) == len(labels))
-	svm.train(trainData, cv2.ml.ROW_SAMPLE, labels)
-	svm.save('svm_data.dat')
-	return svm
-
-
-def svmTestCV(svm, testData):
-	testData = np.float32(testData)
-	result = svm.predict(testData)
-	return result
-
-
-def svmTrainSK(trainData, labels, classification=True):
+def svmTrainSK(trainData, labels, classification=True, save=False):
 	trainData = np.float32(trainData)
 	labels = np.float32(labels)
 	classifier = None
 	if classification:
-		classifier = skSVM.SVC(gamma=0.001, C=100.)
+		param_grid = [{'C': [1, 10, 100, 1000, 10000, 100000], 'gamma': [1, 0.1, 0.01, 0.001, 0.0001, 0.00001], 'kernel': ['rbf']}]	
+		classifier = skSVM.SVC()
+		classifier = model_selection.GridSearchCV(classifier, param_grid)
 	else:
 		classifier = skSVM.SVR()
-	classifier.fit(trainData, labels)  
+	classifier.fit(trainData, labels)
+	if classification:
+		print(classifier.best_params_)
+	if save:
+		with open('model.pkl', 'wb') as f:
+			pickle.dump(classifier, f) 
 	return classifier
 
 
@@ -186,10 +191,6 @@ def svmTestSK(classifier, testData):
 	testData = np.float32(testData)
 	result = classifier.predict(testData)
 	return result
-
-
-def headAngle():
-	collateData()
 
 
 def MLClassification(data, labels, zipped):
@@ -201,8 +202,6 @@ def MLClassification(data, labels, zipped):
 	testLabels = labels[(len(data)*3)//4:]
 	classifier = svmTrainSK(trainData, trainLabels)
 	result = svmTestSK(classifier, testData)
-	print(classifier.get_params())
-	print(result)
 	result = result.tolist()
 	theSame = 0
 	for i in range(len(testLabels)):
@@ -219,20 +218,18 @@ def MLClassification(data, labels, zipped):
 
 def MLRegression(data, labels, zipped):
 	data, labels = zip(*zipped)
-	labels = [a+2 for a in labels]
 	trainData = data[0:(len(data)*3)//4]
 	testData = data[(len(data)*3)//4:]
 	trainLabels = labels[0:(len(data)*3)//4]
 	testLabels = labels[(len(data)*3)//4:]
 	classifier = svmTrainSK(trainData, trainLabels, classification=False)
 	result = svmTestSK(classifier, testData)
-	print(result)
 	result = result.tolist()
 	theSame = 0
 	meanDiff = 0.0
 	#change for comparison
-	testLabels = [1 if label >= 2 else 0 for label in testLabels]
-	result = [1 if label >= 2 else 0 for label in result]
+	testLabels = [1 if label >= 0 else 0 for label in testLabels]
+	result = [1 if label >= 0 else 0 for label in result]
 	for i in range(len(testLabels)):
 		meanDiff += math.pow(testLabels[i]-result[i],2)
 		if testLabels[i] == result[i]:
@@ -240,27 +237,24 @@ def MLRegression(data, labels, zipped):
 	print(theSame)
 	print(len(testLabels))
 	meanDiff = meanDiff / len(testLabels)
-
 	MLRegressionEval(data, labels)
 
 
 def MLClassificationEval(data, labels):
-	kfold = model_selection.KFold(n_splits=10, random_state=7)
+	kfold = model_selection.KFold(n_splits=5, random_state=7)
 	model = skSVM.SVC(gamma=0.001, C=100.)
-	scoring = 'r2'
+	scoring = 'roc_auc' #roc_auc or r2
 	results = model_selection.cross_val_score(model, data, labels, cv=kfold, scoring=scoring)
 	print(results.mean())
 
 
 def MLRegressionEval(data, labels):
-
-	kfold = model_selection.KFold(n_splits=10, random_state=7)
-	scoring = 'neg_mean_absolute_error'
+	kfold = model_selection.KFold(n_splits=5, random_state=7)
+	scoring = 'neg_mean_absolute_error' #neg_mean_absolute_error or r2
 	model = skSVM.SVR()
 	score = model_selection.cross_val_score(model, data, labels, cv=kfold, scoring=scoring)
 	print(score)
 	print(score.mean())
-	print(score.std())
 
 
 def performKFold(k, data, labels, classification):
@@ -268,12 +262,9 @@ def performKFold(k, data, labels, classification):
 	allresultlabels = []
 	if classification:
 		labels = [1 if label >= 0 else -1 for label in labels]
-	else:
-		labels = [a+2 for a in labels]
 	for i in range(k):
 		l = len(data)
 		w = len(data) / k
-		print(w)
 		trainData = data[:int(i*w)] + data[int((i+1)*w):]
 		testData = data[int(i*w):int((i+1)*w)]
 		trainLabels = labels[:int(i*w)] + labels[int((i+1)*w):]
@@ -282,19 +273,10 @@ def performKFold(k, data, labels, classification):
 		result = svmTestSK(classifier, testData)
 		alltestlabels += testLabels
 		allresultlabels += result.tolist()
-		theSame = 0
-		if not classification:
-			result = [1 if label >= 2 else 0 for label in result.tolist()]
-			testLabels = [1 if label >= 2 else 0 for label in testLabels]	
-		for i in range(len(testLabels)):
-			if result[i] == testLabels[i]:
-				theSame += 1
-		print(theSame)
 	theSame = 0
-	print(allresultlabels)
 	if not classification:
-		allresultlabels = [1 if label >= 2 else 0 for label in allresultlabels]
-		alltestlabels = [1 if label >= 2 else 0 for label in alltestlabels]	
+		allresultlabels = [1 if label >= 0 else 0 for label in allresultlabels]
+		alltestlabels = [1 if label >= 0 else 0 for label in alltestlabels]	
 	for i in range(len(alltestlabels)):
 		if alltestlabels[i] == allresultlabels[i]:
 			theSame += 1
@@ -303,19 +285,51 @@ def performKFold(k, data, labels, classification):
 	print(metrics.confusion_matrix(alltestlabels, allresultlabels))
 
 
+def badData(label):
+	valueCount = [label.count(2) + label.count(1), label.count(0), label.count(-1) + label.count(-2)]
+	return valueCount == [0,0,0]
+	return not ((4 in valueCount or 5 in valueCount) and not valueCount == [0,0,0])
+
+
+def performKripp():
+	labelSet = collateDataKripp()
+	valueSet = []
+	badOnes = 0
+	for label in labelSet:
+		newValue = [label.count(2) + label.count(1), label.count(0), label.count(-1) + label.count(-2)]
+		if not badData(label):
+			valueSet.append(newValue)
+		if badData(label):
+			badOnes += 1
+	print(valueSet)
+	valueSet = np.array(valueSet)
+	krippVal = krippendorff.alpha(value_counts=valueSet, level_of_measurement='ordinal')
+	print(krippVal)
+	print(badOnes)
+
 
 def main():
-	return analyseData(collateData())
-	"""
-	data, labels = collateDataML()
+	#performKripp()
+	#return analyseData(collateData())
+	data, labels = collateDataMLFullArray()
+	labels = [statistics.mean(label) for label in labels]
+	imp = Imputer(missing_values=-1, strategy='mean', axis=0)
+	imp.fit(data)
+	data = imp.transform(data)
 	zipped = list(zip(data, labels))
 	random.shuffle(zipped)
-	MLClassification(data, labels, zipped)
-	MLRegression(data, labels, zipped)
+	#MLClassification(data, labels, zipped)
+	#MLRegression(data, labels, zipped)
 	data, labels = zip(*zipped)
-	#performKFold(4, data, labels, False)
-	#performKFold(4, data, labels, True)
-	"""
+	performKFold(10, data, labels, True)
+	performKFold(10, data, labels, False)
+
+	#for training actual model used
+	#svmTrainSK(data, labels, classification=False, save=True)
+
+	
+	
 
 if __name__ == "__main__":
 	main()
+

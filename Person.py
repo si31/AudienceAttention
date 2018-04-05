@@ -1,6 +1,7 @@
 import sys
 import cv2
-import HelperFunctions 
+import HelperFunctions
+import numpy as np
 
 class Person:
 
@@ -81,8 +82,11 @@ def accumulateData(person):
 			person.lookingForward = 0
 		else:
 			person.lookingForward = 1
+	else:
+		person.poseDistance = 150 if person.headPoseOP else 0
+		person.poseAngle = -1
 	if person.postureLR == -1.0:
-		person.postureArea = 1
+		person.postureArea = -1
 	elif person.postureLR < -0.10:
 		person.postureArea = 2
 	elif person.postureLR > 0.10:
@@ -90,8 +94,13 @@ def accumulateData(person):
 	else:
 		person.postureArea = 1
 		
+<<<<<<< Updated upstream
 	person.data = [person.blur, person.lookingForward, person.postureArea, person.occlusion, person.poseAngle, person.poseDistance, person.blur, person.headPoseOP]#, person.attention]
 	#remove last one
+=======
+	person.data = [person.lookingForward, person.postureArea, person.occlusion, person.poseAngle, person.poseDistance, person.postureLR]#, person.attention]
+
+>>>>>>> Stashed changes
 
 class LabelsForPerson:
 

@@ -167,3 +167,4 @@ def getPosture(img):
 
 if __name__ == '__main__':
 	runOP(Image(cv2.imread('imgsInDatabase/img1.jpg')).image)
+

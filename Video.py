@@ -7,7 +7,7 @@ class Video:
 		self.frameImages = [] # actual images
 		self.frames = [] #image objects
 		self.persons = [] #array of videoPerson objects
-		self.attention = 0
+		self.attention = 0.0
 
 	def collatePersons(self): #run command here
 		print('Collating...')
@@ -53,6 +53,13 @@ class Video:
 				frameWithHighest = frame
 		return frameWithHighest
 
+	def calculateAverageAttention(self):
+		attentionSum = 0.0
+		for imagePerson in self.imagePersons:
+			if imagePerson is not None:
+				attentionSum += imagePerson.attention
+		self.attention = attentionSum/self.numberOfFramesIn
+
 
 class VideoPerson:
 
@@ -74,8 +81,8 @@ class VideoPerson:
 		self.averagePosition = ((x1+x2)//2,(y1+y2)//2,(w1+w2)//2,(h1+h2)//2)
 
 	def calcAverageAttention(self):
-		attentionSum = 0
+		attentionSum = 0.0
 		for imagePerson in self.imagePersons:
 			if imagePerson is not None:
 				attentionSum += imagePerson.attention
-		self.averagePosition = attentionSum/self.numberOfFramesIn
+		self.attention = attentionSum/self.numberOfFramesIn

@@ -17,6 +17,7 @@ import HelperFunctions
 import HAAR
 import GraphCreator
 import Teach
+import sklearn
 
 from Person import Person, accumulateData, printData
 from Image import Image
@@ -61,11 +62,26 @@ def detectFeatures(img):
 
 def calculateAttention(img):
 	#need to load model and then use it to predict attention for each person
-	#need to pass image to the accumulate data function to allow it to get its blur for each section	
-	if True:# if model does not exist
-		print('Attention not estimated as model does not exist.')
-	else:
+	exists = False
+	for file in os.listdir():
+		if file == 'model.pkl':
+			exists = True
+			break
+	if exists:
 		print('Estimating attention...')
+		classifier = None
+		with open('model.pkl', 'rb') as f:
+			classifier = pickle.load(f)
+		averageAttention = 0.0
+		for person in img.persons:
+			result = Teach.svmTestSK(classifier, [person.data])
+			[attention] = result.tolist()
+			person.attention = attention/2
+			averageAttention += person.attention
+		img.attention = averageAttention / len(img.persons)
+	else:
+		print('Attention not estimated as model does not exist.')
+
 
 def handleImage(imgName, imgFile):
 	img = None
@@ -83,10 +99,10 @@ def handleImage(imgName, imgFile):
 				img = Image(imgFile)
 				FaceDetection.findFaces(img, mark=False)
 			detectFeatures(img)
-		calculateAttention(img)
 		#ComputerVision.findMovement(img)
 		for person in img.persons:
 			accumulateData(person)
+		calculateAttention(img)
 
 	return img
 
@@ -115,7 +131,7 @@ def displayInterface(img, video=False):
 	root.title("Audience Attention Analyser")
 	root.geometry("{0}x{1}+0+0".format(root.winfo_screenwidth(), root.winfo_screenheight()))
 	root.focus_set()
-	tk.Label(root, text="Overall Attention = ").pack()
+	tk.Label(root, text="Overall Attention = " + str(img.attention)).pack()
 	tk.Label(root, text="View person: ").pack()
 	tk.Entry(root, textvariable=USER_INPUT).pack()
 	tk.Button(root, text="Print details of person", command=viewPerson).pack()
@@ -127,7 +143,7 @@ def displayInterface(img, video=False):
 	height = int(ratio * img.image.shape[0])
 	imgToShow = cv2.resize(img.image, (1150,height), interpolation=cv2.INTER_LINEAR);
 	for index, person in enumerate(img.persons): #annotation always happens after saving so the image is not affected
-		HelperFunctions.annotateImage(imgToShow, person.face, 42, index, ratio)
+		HelperFunctions.annotateImage(imgToShow, person.face, '{0:.0f}'.format(person.attention*100), index, ratio)
 	imgToShow = cv2.cvtColor(imgToShow, cv2.COLOR_BGR2RGB)
 	imgPIL = PILIm.fromarray(imgToShow)
 	imgTk = ImageTk.PhotoImage(imgPIL)
@@ -269,4 +285,4 @@ def autoMain():
 
 
 if __name__ == "__main__":
-	autoMain()
+	main()
