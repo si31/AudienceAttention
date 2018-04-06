@@ -67,6 +67,8 @@ class PersonOPPoints:
 
 	def __init__(self, face, hands, keypoints):
 		self.face = face
+		self.keypoints = keypoints
+		self.hands = hands
 		self.rightHandBB = self.resizeHand(face, hands[0:4])
 		self.leftHandBB = self.resizeHand(face, hands[4:8])
 		self.centreFace = keypoints[0] #maybe nose
@@ -161,6 +163,7 @@ def getPosture(img):
 		occlusion = determineHandPositionType(personB.face, personB.leftHandBB, personB.rightHandBB)
 		personA.occlusion = occlusion
 		personA.headPoseOP = True
+		personA.leftLooking = [personB.face, personB.hands, persons.keypoints]
 		personA.postureLR = shoulderAngle(personB.leftShoulder, personB.rightShoulder)
 		personA.lookingForward = personB.calcHeadPose()
 

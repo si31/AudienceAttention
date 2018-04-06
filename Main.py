@@ -285,4 +285,4 @@ def autoMain():
 
 
 if __name__ == "__main__":
-	main()
+	autoMain()
