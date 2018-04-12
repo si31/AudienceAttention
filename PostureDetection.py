@@ -163,7 +163,7 @@ def getPosture(img):
 		occlusion = determineHandPositionType(personB.face, personB.leftHandBB, personB.rightHandBB)
 		personA.occlusion = occlusion
 		personA.headPoseOP = True
-		personA.leftLooking = [personB.face, personB.hands, persons.keypoints]
+		personA.leftLooking = [personB.face, personB.hands, personB.keypoints]
 		personA.postureLR = shoulderAngle(personB.leftShoulder, personB.rightShoulder)
 		personA.lookingForward = personB.calcHeadPose()
 

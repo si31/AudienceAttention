@@ -38,7 +38,7 @@ def collateData():
 						labelData = [1, firstLabel.humanMovement, firstLabel.humanPoseAngle, firstLabel.humanPostureLR, 
 									firstLabel.humanOcclusion, firstLabel.humanEyeAngle, attention, i]
 
-					data.append((person.data, labelData, person.face))
+					data.append((person.data, labelData, person.face, person.leftLooking))
 	return data
 
 
@@ -73,8 +73,18 @@ def collateDataMLFullArray():
 						for label in person.labels[1:]:
 							attentions.append(label.humanAttention)
 				if not badData(attentions):# and person.data[1:2] != [-1]:
-					labelSet.append(attentions)
-					data.append(person.data)
+					if person.leftLooking is not None:
+						labelSet.append(attentions)
+						dataPoint = [item for sublist in person.leftLooking for item in sublist]
+						new = []
+						for data in dataPoint:
+							if isinstance(data, list):
+								print(data)
+								new += [item for item in data]
+							else:
+								new.append(data)
+						print(new)
+						data.append(new)#erson.data
 
 	return data, labelSet
 
@@ -115,8 +125,9 @@ def analyseData(data):
 	i=0
 	poseValues = [[],[],[]]
 	blurValues = [[],[]]
-	for ([computerLookingForward, computerPostureArea, computerOcclusion, poseAngle, poseDistance, postureLR], [humanFace, humanMovement, humanPoseAngle, humanPostureLR, humanOcclusion, humanEyeAngle, humanAttention, noLabels], face) in data:
+	for ([computerLookingForward, computerPostureArea, computerOcclusion, poseAngle, poseDistance, postureLR], [humanFace, humanMovement, humanPoseAngle, humanPostureLR, humanOcclusion, humanEyeAngle, humanAttention, noLabels], face, points) in data:
 		if humanFace == 1:
+
 			if computerPostureArea != -1:		
 				if computerPostureArea == humanPostureLR:
 					postureCorrect += 1
@@ -154,6 +165,7 @@ def svmTrainSK(trainData, labels, classification=True, save=False):
 	trainData = np.float32(trainData)
 	labels = np.float32(labels)
 	classifier = None
+	print(trainData)
 	if classification:
 		param_grid = [{'C': [1, 10, 100, 1000, 10000, 100000], 'gamma': [1, 0.1, 0.01, 0.001, 0.0001, 0.00001], 'kernel': ['rbf']}]	
 		classifier = skSVM.SVC()
@@ -295,7 +307,8 @@ def main():
 	#return analyseData(collateData())
 	data, labels = collateDataMLFullArray()
 	labels = [statistics.mean(label) for label in labels]
-	imp = Imputer(missing_values=-1, strategy='mean', axis=0)
+	imp = Imputer(missing_values=0.0, strategy='mean', axis=0)
+	print(data)
 	imp.fit(data)
 	data = imp.transform(data)
 	zipped = list(zip(data, labels))

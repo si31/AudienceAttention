@@ -48,8 +48,8 @@ def showAllPeople(persons):
 def detectFeatures(img):
 	print('Detecting landmarks, head pose, blur...')
 	for person in img.persons:
-		ComputerVision.faceLandmarks(person, mark=False)
-		HeadDirection.getPose(person, img.image.shape, mark=False)
+		#ComputerVision.faceLandmarks(person, mark=False)
+		#HeadDirection.getPose(person, img.image.shape, mark=False)
 		person.blur = 0 #ComputerVision.blur(person.image)
 		pass
 	print('Detecting occlusion, posture...')
