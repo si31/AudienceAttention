@@ -274,14 +274,15 @@ def performKFold(k, data, labels, classification):
 	for i in range(len(alltestlabels)):
 		if alltestlabels[i] == allresultlabels[i]:
 			theSame += 1
+	print('hi')
 	print(theSame)
 	print(len(allresultlabels))
 	print(metrics.confusion_matrix(alltestlabels, allresultlabels))
+	print(metrics.f1_score(alltestlabels, allresultlabels))
 
 
 def badData(label):
 	valueCount = [label.count(2) + label.count(1), label.count(0), label.count(-1) + label.count(-2)]
-	return valueCount == [0,0,0]
 	return not ((4 in valueCount or 5 in valueCount) and not valueCount == [0,0,0])
 
 
@@ -314,9 +315,9 @@ def main():
 	zipped = list(zip(data, labels))
 	random.shuffle(zipped)
 	#MLClassification(data, labels, zipped)
-	#MLRegression(data, labels, zipped)
+	MLRegression(data, labels, zipped)
 	data, labels = zip(*zipped)
-	performKFold(10, data, labels, True)
+	#performKFold(10, data, labels, True)
 	performKFold(10, data, labels, False)
 
 	#for training actual model used
