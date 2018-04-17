@@ -38,7 +38,7 @@ def collateData():
 						labelData = [1, firstLabel.humanMovement, firstLabel.humanPoseAngle, firstLabel.humanPostureLR, 
 									firstLabel.humanOcclusion, firstLabel.humanEyeAngle, attention, i]
 
-					data.append((person.data, labelData, person.face, person.leftLooking))
+					data.append((person.data, labelData, person.face, person.leftLooking, person.attention))
 	return data
 
 
@@ -122,11 +122,31 @@ def analyseData(data):
 	poseCorrect = 0
 	poseIncorrect = 0
 	faces = 0
+	var1 = 0
+	var2 = 0
+	var3 = 0
+	var4 = 0
+
+	qualityComparison = []
+
 	i=0
 	poseValues = [[],[],[]]
 	blurValues = [[],[]]
-	for ([computerLookingForward, computerPostureArea, computerOcclusion, poseAngle, poseDistance, postureLR], [humanFace, humanMovement, humanPoseAngle, humanPostureLR, humanOcclusion, humanEyeAngle, humanAttention, noLabels], face, points) in data:
+	for ([computerLookingForward, computerPostureArea, computerOcclusion, poseAngle, poseDistance, postureLR], [humanFace, humanMovement, humanPoseAngle, humanPostureLR, humanOcclusion, humanEyeAngle, humanAttention, noLabels], face, points, predAttention) in data:
 		if humanFace == 1:
+			
+			if predAttention is not None and predAttention > 0:
+				if computerLookingForward == 1:
+					var1 += 1
+				else:
+					var2 += 1
+			else:
+				if computerLookingForward == 1:
+					var3 += 1
+				else:
+					var4 += 1
+			
+			(x,y,w,h) = face
 
 			if computerPostureArea != -1:		
 				if computerPostureArea == humanPostureLR:
@@ -134,8 +154,10 @@ def analyseData(data):
 				else:
 					postureIncorrect += 1
 				if computerOcclusion == humanOcclusion:
+					qualityComparison.append((w*h, True))
 					occlusionCorrect += 1
 				else:
+					qualityComparison.append((w*h, False))
 					occlusionIncorrect += 1
 			else:
 				postureOcclusionNA += 1
@@ -143,7 +165,6 @@ def analyseData(data):
 				poseCorrect += 1
 			else:
 				poseIncorrect += 1
-			(x,y,w,h) = face
 			faces += w*h
 			i += 1
 		else:
@@ -157,6 +178,27 @@ def analyseData(data):
 	print('poseIncorrect: ' + str(poseIncorrect))
 	print('False Negatives: ' + str(falseDetections))
 	print('Total: ' + str(totalDetections))
+
+	print(":")
+	print((var1,var2,var3,var4))
+	cat1 = []
+	cat2 = []
+	cat3 = []
+	cat4 = []
+	cat5 = []
+	for (size, val) in qualityComparison:
+		if size < 1000:
+			cat1.append(val)
+		elif size < 3000:
+			cat2.append(val)
+		elif size < 5000:
+			cat3.append(val)
+		elif size < 7000:
+			cat4.append(val)
+		else:
+			cat5.append(val)
+	print((len(cat1), len(cat2), len(cat3), len(cat4), len(cat5)))
+	print(sum(cat1), sum(cat2), sum(cat3), sum(cat4), sum(cat5))
 	#GraphCreator.createGraph(poseValues[0], blurValues[0], '', '', '', labels=blurValues[1])
 	return [postureCorrect, postureIncorrect, occlusionCorrect, occlusionIncorrect, postureOcclusionNA, poseCorrect, poseIncorrect, totalDetections-falseDetections]
 
@@ -304,8 +346,9 @@ def performKripp():
 
 
 def main():
-	#performKripp()
-	#return analyseData(collateData())
+	performKripp()
+	return analyseData(collateData())
+	"""
 	data, labels = collateDataMLFullArray()
 	labels = [statistics.mean(label) for label in labels]
 	imp = Imputer(missing_values=0.0, strategy='mean', axis=0)
@@ -322,7 +365,7 @@ def main():
 
 	#for training actual model used
 	#svmTrainSK(data, labels, classification=False, save=True)
-	
+	"""
 
 if __name__ == "__main__":
 	main()
