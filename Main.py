@@ -48,8 +48,8 @@ def showAllPeople(persons):
 def detectFeatures(img):
 	print('Detecting landmarks, head pose, blur...')
 	for person in img.persons:
-		#ComputerVision.faceLandmarks(person, mark=False)
-		#HeadDirection.getPose(person, img.image.shape, mark=False)
+		ComputerVision.faceLandmarks(person, mark=False)
+		HeadDirection.getPose(person, img.image.shape, mark=False)
 		person.blur = 0 #ComputerVision.blur(person.image)
 		pass
 	print('Detecting occlusion, posture...')
@@ -114,8 +114,9 @@ videoGLO = None
 
 
 def affect(img):
+	return
 	image = img.image
-	k = -30
+	k = 0
 	for x in range(image.shape[0]):
 		for y in range(image.shape[1]):
 			image[x][y] = np.array([x+k if k+x > 0 else 0 for x in image[x][y].tolist()])
@@ -234,6 +235,7 @@ def handleVideoFile(vidName, frameInterval):
 		cv2.destroyAllWindows()
  
 		video.collatePersons()
+		video.calculateOverallAttention()
 
 	for person in video.persons:    
 		print(person.imagePersons)
@@ -245,6 +247,9 @@ def handleVideoFile(vidName, frameInterval):
 		global videoGLO
 		videoGLO = video
 		displayInterface(video.frameWithMostDetections(), True)
+	
+	video.calculateOverallAttention()
+	print(video.attention)
 
 	#run viewer on frame with mode people in, plus give option of graphs and each person's graph
 
@@ -263,7 +268,7 @@ def main():
 	if fileName.endswith('.jpg') or fileName.endswith('.png'):
 		handleImageFile(fileName)
 	elif fileName.endswith('.mp4'):
-		handleVideoFile(fileName, 15)
+		handleVideoFile(fileName, 20)
 	else:
 		print('Input file is of wrong type. Please use .jpg or .png for images and .mp4 for videos.')
 
@@ -285,4 +290,4 @@ def autoMain():
 
 
 if __name__ == "__main__":
-	autoMain()
+	main()

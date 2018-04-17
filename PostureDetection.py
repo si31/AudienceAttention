@@ -41,7 +41,7 @@ def runOP(img):
 		keypoints = PersonOPPoints(faces[index], hands[index], person)
 		personOPPointss.append(keypoints)
 	
-	view = False
+	view = True
 
 	if view:
 		res = op.render(img) #get OP to render the body positions onto the image

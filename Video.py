@@ -25,6 +25,8 @@ class Video:
 				toRemove.append(videoPerson)
 		for bad in toRemove:
 			self.persons.remove(bad)
+		for person in self.persons:
+			person.calcAverageAttention()
 
 	def trackPersonAcrossFrames(self, index, personInFrame): #personinframe is an Image object
 		found = False
@@ -36,12 +38,9 @@ class Video:
 		if not found:
 			self.persons.append(VideoPerson(personInFrame, index, self))
 
-	def fillInFrameHoles(self):
-		pass # fill in frames that do not have a person in from not being detected
-
 	def calculateOverallAttention(self):
 		for videoPerson in self.persons:
-			self.attention += videoPerson.averageAttention
+			self.attention += videoPerson.attention
 		self.attention = self.attention / len(self.persons)
 
 	def frameWithMostDetections(self):
@@ -53,13 +52,6 @@ class Video:
 				frameWithHighest = frame
 		return frameWithHighest
 
-	def calculateAverageAttention(self):
-		attentionSum = 0.0
-		for imagePerson in self.imagePersons:
-			if imagePerson is not None:
-				attentionSum += imagePerson.attention
-		self.attention = attentionSum/self.numberOfFramesIn
-
 
 class VideoPerson:
 
@@ -67,11 +59,12 @@ class VideoPerson:
 		self.imagePersons = [None] * len(video.frames) # length of no. of frames, each points to the person in the frame or None if no person detected, image objects
 		self.imagePersons[initalFrameIndex] = initalFramePerson 
 		self.averagePosition = initalFramePerson.face
-		self.averageAttention = 0
+		self.attention = 0
 		self.numberOfFramesIn = 1
 
 	def addFrame(self, personInFrame, frameIndex):
-		self.imagePersons[frameIndex] = personInFrame
+		print(frameIndex)
+		self.imagePersons[frameIndex+1] = personInFrame
 		self.numberOfFramesIn += 1
 		self.averagePosition = personInFrame.face#self.calcNewAveragePosition(personInFrame.face)
 
@@ -82,7 +75,10 @@ class VideoPerson:
 
 	def calcAverageAttention(self):
 		attentionSum = 0.0
+		print(self.imagePersons)
 		for imagePerson in self.imagePersons:
 			if imagePerson is not None:
 				attentionSum += imagePerson.attention
+				print(imagePerson.attention)
+		print(self.numberOfFramesIn)
 		self.attention = attentionSum/self.numberOfFramesIn

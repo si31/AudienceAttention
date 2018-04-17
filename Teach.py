@@ -304,8 +304,8 @@ def performKripp():
 
 
 def main():
-	#performKripp()
-	#return analyseData(collateData())
+	performKripp()
+	return analyseData(collateData())
 	data, labels = collateDataMLFullArray()
 	labels = [statistics.mean(label) for label in labels]
 	imp = Imputer(missing_values=0.0, strategy='mean', axis=0)
