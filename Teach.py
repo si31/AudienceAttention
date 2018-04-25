@@ -24,21 +24,28 @@ def collateData():
 			for person in img.persons:
 				accumulateData(person)
 				if person.labels != []:
-					firstLabel = person.labels[0]
-					if firstLabel.humanFace == 0:
-						labelData = [0, 0, 0, 0, 0, 0, 0, 1]
-					else:
-						attention = 0
-						i = 0
-						for label in person.labels[1:]:
-							attention += label.humanAttention
-							i += 1
-						divValue = len(person.labels[1:]) if len(person.labels[1:]) >= 1 else 1
-						attention = attention / divValue
-						labelData = [1, firstLabel.humanMovement, firstLabel.humanPoseAngle, firstLabel.humanPostureLR, 
-									firstLabel.humanOcclusion, firstLabel.humanEyeAngle, attention, i]
+					attentions = []
+					if person.labels != []:
+						label = person.labels[0]
+						if label.humanFace == 1:
+							for label in person.labels[1:]:
+								attentions.append(label.humanAttention)
+					if not badData(attentions):
+						firstLabel = person.labels[0]
+						if firstLabel.humanFace == 0:
+							labelData = [0, 0, 0, 0, 0, 0, 0, 1]
+						else:
+							attention = 0
+							i = 0
+							for label in person.labels[1:]:
+								attention += label.humanAttention
+								i += 1
+							divValue = len(person.labels[1:]) if len(person.labels[1:]) >= 1 else 1
+							attention = attention / divValue
+							labelData = [1, firstLabel.humanMovement, firstLabel.humanPoseAngle, firstLabel.humanPostureLR, 
+										firstLabel.humanOcclusion, firstLabel.humanEyeAngle, attention, i]
 
-					data.append((person.data, labelData, person.face, person.leftLooking, person.attention))
+						data.append((person.data, labelData, person.face, person.leftLooking, person.attention))
 	return data
 
 
@@ -58,7 +65,7 @@ def collateDataKripp():
 				labelSet.append(attentions)
 	return labelSet
 
-def collateDataMLFullArray():
+def collateDataMLFullArray(): #inc openpose
 	labelSet = []
 	data = []
 	for file in os.listdir("Database/"):
@@ -73,18 +80,22 @@ def collateDataMLFullArray():
 						for label in person.labels[1:]:
 							attentions.append(label.humanAttention)
 				if not badData(attentions):# and person.data[1:2] != [-1]:
+					labelSet.append(attentions)
+					data.append(person.data)
+					"""
 					if person.leftLooking is not None:
-						labelSet.append(attentions)
-						dataPoint = [item for sublist in person.leftLooking for item in sublist]
-						new = []
-						for data in dataPoint:
-							if isinstance(data, list):
-								print(data)
-								new += [item for item in data]
-							else:
-								new.append(data)
-						print(new)
-						data.append(new)#erson.data
+					labelSet.append(attentions)
+					dataPoint = [item for sublist in person.leftLooking for item in sublist]
+					new = []
+					for data in dataPoint:
+						if isinstance(data, list):
+							print(data)
+							new += [item for item in data]
+						else:
+							new.append(data)
+					print(new)
+					data.append(new)#erson.data
+					"""
 
 	return data, labelSet
 
@@ -131,11 +142,13 @@ def analyseData(data):
 
 	i=0
 	poseValues = [[],[],[]]
-	blurValues = [[],[]]
+	graphValues = [[],[]]
 	for ([computerLookingForward, computerPostureArea, computerOcclusion, poseAngle, poseDistance, postureLR], [humanFace, humanMovement, humanPoseAngle, humanPostureLR, humanOcclusion, humanEyeAngle, humanAttention, noLabels], face, points, predAttention) in data:
 		if humanFace == 1:
 			
-			if predAttention is not None and predAttention > 0:
+			(x,y,w,h) = face
+			"""
+			if predAttention > 0:
 				if computerLookingForward == 1:
 					var1 += 1
 				else:
@@ -145,10 +158,28 @@ def analyseData(data):
 					var3 += 1
 				else:
 					var4 += 1
-			
-			(x,y,w,h) = face
+			"""
 
-			if computerPostureArea != -1:		
+			if computerPostureArea != -1:
+				
+				if predAttention <= 0:
+					if computerPostureArea == 0:
+						var1 += 1
+					elif computerPostureArea == 1:
+						var2 += 1
+					else:
+						var3 += 1
+				"""
+				if predAttention <= 0:
+					if computerOcclusion == 1:
+						var1 += 1
+					else:
+						var2 += 1
+				"""
+
+				graphValues[0].append(postureLR)
+				graphValues[1].append(predAttention)
+
 				if computerPostureArea == humanPostureLR:
 					postureCorrect += 1
 				else:
@@ -199,7 +230,7 @@ def analyseData(data):
 			cat5.append(val)
 	print((len(cat1), len(cat2), len(cat3), len(cat4), len(cat5)))
 	print(sum(cat1), sum(cat2), sum(cat3), sum(cat4), sum(cat5))
-	#GraphCreator.createGraph(poseValues[0], blurValues[0], '', '', '', labels=blurValues[1])
+	#GraphCreator.createGraph(graphValues[1], graphValues[0], '', '', '')
 	return [postureCorrect, postureIncorrect, occlusionCorrect, occlusionIncorrect, postureOcclusionNA, poseCorrect, poseIncorrect, totalDetections-falseDetections]
 
 
@@ -346,26 +377,25 @@ def performKripp():
 
 
 def main():
-	performKripp()
+	#performKripp()
 	return analyseData(collateData())
-	"""
+	
 	data, labels = collateDataMLFullArray()
 	labels = [statistics.mean(label) for label in labels]
 	imp = Imputer(missing_values=0.0, strategy='mean', axis=0)
-	print(data)
 	imp.fit(data)
 	data = imp.transform(data)
 	zipped = list(zip(data, labels))
 	random.shuffle(zipped)
 	#MLClassification(data, labels, zipped)
-	MLRegression(data, labels, zipped)
+	#MLRegression(data, labels, zipped)
 	data, labels = zip(*zipped)
-	#performKFold(10, data, labels, True)
+	performKFold(10, data, labels, True)
 	performKFold(10, data, labels, False)
 
 	#for training actual model used
 	#svmTrainSK(data, labels, classification=False, save=True)
-	"""
+	
 
 if __name__ == "__main__":
 	main()

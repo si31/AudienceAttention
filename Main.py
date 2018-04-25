@@ -12,7 +12,7 @@ import FaceDetection
 import ComputerVision
 import MachineLearning
 import HeadDirection
-import PostureDetection
+#import PostureDetection
 import HelperFunctions
 import HAAR
 import GraphCreator
@@ -158,26 +158,41 @@ def viewGraphOfPerson():
 	index = int(USER_INPUT.get())
 	person = imgGLO.persons[index]
 	videoPersonSelected = None
+	print(person)
+	print(video.persons)
 	for videoPerson in video.persons:
-		print('1')
 		print(videoPerson.imagePersons)
 		if person in videoPerson.imagePersons:
 			print('Found person')
 			videoPersonSelected = videoPerson
 	#display graph
-	data = [(val.attention, index) for index, val in enumerate(videoPersonSelected.imagePersons) if val is not None]
-	print(data)
+	print(videoPersonSelected)
+	if videoPersonSelected is None:
+		print("Error: can't find person")
+		return
+	data = [(index, val.attention) if val is not None else (index, 0) for index, val in enumerate(videoPersonSelected.imagePersons)]
 	xData = [a for a,b in data]
 	yData = [b for a,b in data]
-	GraphCreator.createGraph(xData, yData, 'hi', 'bye', 'poo')
+	GraphCreator.createGraph(xData, yData, 'Graph of attention over time for person ' + str(index), 'Time', 'Attention')
 
 
 def viewGraphOfAttention():
-	global USER_INPUT, imgGLO
-	index = int(USER_INPUT.get())
-	person = imgGLO.persons[index]
-	printData(person)
-	pass
+	global videoGLO
+	video = videoGLO
+	attention = [0] * len(video.frames)
+	counts = [0] * len(video.frames)
+	for videoPerson in video.persons:
+		for index, person in enumerate(videoPerson.imagePersons):
+			if person is not None:
+				attention[index] += person.attention
+				counts[index] += 1
+	for i in range(len(attention)):
+		if counts[i] != 0:
+			attention[i] = attention[i] / counts[i]
+	yData = attention
+	xData = range(len(attention))
+	GraphCreator.createGraph(xData, yData, 'Graph of attention over time for the whole group', 'Time', 'Attention')
+
 
 
 def viewPerson():
@@ -236,9 +251,6 @@ def handleVideoFile(vidName, frameInterval):
  
 		video.collatePersons()
 		video.calculateOverallAttention()
-
-	for person in video.persons:    
-		print(person.imagePersons)
 
 	if sys.argv[3] == '1':
 		HelperFunctions.saveToDatabase(video, vidName)

@@ -4,13 +4,11 @@ import numpy as np
 import matplotlib as mpl
 mpl.use('TkAgg')
 import matplotlib.pyplot as plt
-
 import HelperFunctions
 
 
-
 def plotScatter(x, y):
-	plt.scatter(x, y, alpha=0.5)
+	plt.plot(x, y, alpha=0.5)
 	plt.title('Scatter plot')
 	plt.xlabel('x')
 	plt.ylabel('y')
@@ -36,8 +34,9 @@ def createLinearRegressionModel(x,y, plot=False):
 		plt.show()
 
 def createGraph(xData, yData, title, xTitle, yTitle, labels=None):
-	plt.scatter(xData, yData, alpha=0.5, c=labels)
+	plt.plot(xData, yData, '-o', alpha=0.5, c=labels)
 	#plt.plot(x,y, alpha = 0.5, color='black')
+	plt.ylim([-1,1])
 	plt.title(title)
 	plt.xlabel(xTitle)
 	plt.ylabel(yTitle)
