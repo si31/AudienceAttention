@@ -15,6 +15,23 @@ def plotScatter(x, y):
 	plt.show()
 
 
+def lineOfBestFit(X, Y):
+
+    xbar = sum(X)/len(X)
+    ybar = sum(Y)/len(Y)
+    n = len(X) # or len(Y)
+
+    numer = sum([xi*yi for xi,yi in zip(X, Y)]) - n * xbar * ybar
+    denum = sum([xi**2 for xi in X]) - n * xbar**2
+
+    b = numer / denum
+    a = ybar - b * xbar
+
+    print('best fit line:\ny = {:.2f} + {:.2f}x'.format(a, b))
+
+    return a, b
+
+
 def createLinearRegressionModel(x,y, plot=False):
 	xArr = [[val] for val in x]
 
@@ -33,6 +50,7 @@ def createLinearRegressionModel(x,y, plot=False):
 
 		plt.show()
 
+
 def createGraph(xData, yData, title, xTitle, yTitle, labels=None):
 	plt.plot(xData, yData, '-o', alpha=0.5, c=labels)
 	#plt.plot(x,y, alpha = 0.5, color='black')
@@ -40,4 +58,7 @@ def createGraph(xData, yData, title, xTitle, yTitle, labels=None):
 	plt.title(title)
 	plt.xlabel(xTitle)
 	plt.ylabel(yTitle)
+	a,b = lineOfBestFit(xData, yData)
+	yfit = [a + b * xi for xi in X]
+	plt.plot(X, yfit)
 	plt.show()
