@@ -132,7 +132,7 @@ def displayInterface(img, video=False):
 	root.title("Audience Attention Analyser")
 	root.geometry("{0}x{1}+0+0".format(root.winfo_screenwidth(), root.winfo_screenheight()))
 	root.focus_set()
-	tk.Label(root, text="Overall Attention = " + str(img.attention)).pack()
+	tk.Label(root, text="Overall Attention = " + str(img.attention * 4/3)).pack()
 	tk.Label(root, text="View person: ").pack()
 	tk.Entry(root, textvariable=USER_INPUT).pack()
 	tk.Button(root, text="Print details of person", command=viewPerson).pack()
@@ -188,7 +188,7 @@ def viewGraphOfAttention():
 				counts[index] += 1
 	for i in range(len(attention)):
 		if counts[i] != 0:
-			attention[i] = attention[i] / counts[i]
+			attention[i] = (attention[i] / counts[i]) * 4/3
 	yData = attention
 	xData = range(len(attention))
 	GraphCreator.createGraph(xData, yData, 'Graph of attention over time for the whole group', 'Time', 'Attention')
