@@ -59,6 +59,6 @@ def createGraph(xData, yData, title, xTitle, yTitle, labels=None):
 	plt.xlabel(xTitle)
 	plt.ylabel(yTitle)
 	a,b = lineOfBestFit(xData, yData)
-	yfit = [a + b * xi for xi in X]
-	plt.plot(X, yfit)
+	yfit = [a + b * xi for xi in xData]
+	plt.plot(xData, yfit)
 	plt.show()
