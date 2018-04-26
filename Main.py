@@ -12,7 +12,7 @@ import FaceDetection
 import ComputerVision
 import MachineLearning
 import HeadDirection
-#import PostureDetection
+import PostureDetection
 import HelperFunctions
 import HAAR
 import GraphCreator
