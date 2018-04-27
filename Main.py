@@ -12,7 +12,7 @@ import FaceDetection
 import ComputerVision
 import MachineLearning
 import HeadDirection
-#import PostureDetection
+import PostureDetection
 import HelperFunctions
 import HAAR
 import GraphCreator
@@ -188,7 +188,7 @@ def viewGraphOfAttention():
 				counts[index] += 1
 	for i in range(len(attention)):
 		if counts[i] != 0:
-			attention[i] = (attention[i] / counts[i]) * 4/3
+			attention[i] = (attention[i] / counts[i]) * (4/3) * (4/3)
 	yData = attention
 	xData = range(len(attention))
 	GraphCreator.createGraph(xData, yData, 'Graph of attention over time for the whole group', 'Time', 'Attention')
@@ -280,7 +280,7 @@ def main():
 	if fileName.endswith('.jpg') or fileName.endswith('.png'):
 		handleImageFile(fileName)
 	elif fileName.endswith('.mp4'):
-		handleVideoFile(fileName, 20)
+		handleVideoFile(fileName, 15)
 	else:
 		print('Input file is of wrong type. Please use .jpg or .png for images and .mp4 for videos.')
 
